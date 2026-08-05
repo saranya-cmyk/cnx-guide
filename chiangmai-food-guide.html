@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CNX — คู่มือร้านเชียงใหม่ 2026</title>
+<meta name="theme-color" content="#12141a">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CNX">
+<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ 117 ร้าน คัดตามเหตุผลที่ควรไปจริง">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Trirong:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --bg:#12141a; --surface:#1a1e26; --surface2:#222731; --line:#2c323d;
+  --ink:#ece5d8; --dim:#8f95a4; --dimmer:#666c7a;
+  --gold:#e2b04a; --jade:#56a58a; --chili:#d9614a; --sky:#7fa3c9;
+  --r:14px;
+  --shadow:0 10px 30px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:'IBM Plex Sans Thai',system-ui,-apple-system,sans-serif;
+  font-size:15px; line-height:1.6;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(60% 38% at 18% -4%, rgba(226,176,74,.13), transparent 70%),
+    radial-gradient(50% 34% at 88% 2%, rgba(86,165,138,.10), transparent 72%);
+}
+[hidden]{display:none!important}
+button{font-family:inherit;font-size:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select{font-family:inherit;font-size:inherit;color:inherit}
+a{color:inherit}
+::selection{background:var(--gold);color:#12141a}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 16px}
+
+/* ---------- header ---------- */
+header{
+  padding:34px 0 20px;display:flex;align-items:center;justify-content:space-between;gap:28px;
+}
+.herotext{flex:1;min-width:0}
+.eyebrow{
+  font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:11px;
+  letter-spacing:.24em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;
+}
+h1{
+  font-family:'Trirong',serif;font-weight:700;
+  font-size:clamp(32px,7.5vw,54px);line-height:1.08;margin:0 0 12px;letter-spacing:-.01em;
+}
+h1 em{font-style:normal;color:var(--gold)}
+.lede{color:var(--dim);max-width:52ch;margin:0 0 12px;font-size:14.5px}
+.statline{margin:0;font-size:12.5px;color:var(--dimmer)}
+.statline b{font-family:'Chakra Petch',sans-serif;font-weight:600;color:var(--gold);font-size:13px}
+.herobowl{flex:none;width:118px;height:118px;opacity:.9}
+.glance{
+  flex:none;width:200px;background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;
+}
+.glancerow{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--dim)}
+.glancerow svg{flex:none;color:var(--gold)}
+.glancerow b{font-family:'Chakra Petch',sans-serif;color:var(--ink);font-size:14px;font-weight:600}
+.gdot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--jade);box-shadow:0 0 0 3px rgba(86,165,138,.25)}
+
+/* ---------- controls ---------- */
+.controls{
+  position:sticky;top:0;z-index:40;
+  background:rgba(18,20,26,.94);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+  margin:0 -16px;padding:11px 16px 9px;
+}
+.searchrow{display:flex;gap:7px;align-items:center;min-width:0}
+.search{
+  flex:1;min-width:0;display:flex;align-items:center;gap:9px;
+  background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:0 12px;
+  transition:border-color .15s;
+}
+.search:focus-within{border-color:var(--gold)}
+.search svg{flex:none;stroke:var(--dim)}
+.search input{flex:1;background:none;border:none;outline:none;padding:11px 0;min-width:0}
+.search input::placeholder{color:var(--dimmer)}
+.iconbtn{
+  flex:none;width:43px;height:43px;border-radius:11px;border:1px solid var(--line);
+  background:var(--surface2);display:grid;place-items:center;position:relative;transition:.15s;
+}
+.iconbtn:hover{border-color:var(--gold)}
+.iconbtn.on{background:var(--gold);border-color:var(--gold);color:#12141a}
+.iconbtn .badge{
+  position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;
+  background:var(--chili);color:#fff;border-radius:9px;
+  font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:700;
+  display:grid;place-items:center;border:2px solid var(--bg);
+}
+.dice{background:linear-gradient(140deg,var(--gold),#c98f2a);border-color:transparent;color:#12141a;font-weight:600}
+
+.tabs{display:flex;gap:4px;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:3px;margin-top:9px}
+.tab{flex:1;text-align:center;padding:8px 6px;border-radius:8px;font-size:13px;color:var(--dim);display:flex;align-items:center;justify-content:center;gap:6px;transition:.15s}
+.tab.on{background:var(--ink);color:#12141a;font-weight:600}
+.tab svg{flex:none}
+
+.chips{display:flex;gap:6px;overflow-x:auto;padding:9px 0 2px;scrollbar-width:none;-ms-overflow-style:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:none;padding:6px 13px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface);color:var(--dim);font-size:13px;white-space:nowrap;transition:.15s;
+}
+.chip:hover{color:var(--ink);border-color:var(--dimmer)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#12141a;font-weight:600}
+.chip .n{font-family:'Chakra Petch',sans-serif;font-size:11px;opacity:.6;margin-left:5px}
+
+.filters{display:none;gap:14px;flex-wrap:wrap;padding:12px 0 4px;border-top:1px solid var(--line);margin-top:9px}
+.filters.open{display:flex}
+.fgroup{flex:1;min-width:180px}
+.flabel{
+  font-family:'Chakra Petch',sans-serif;font-size:10px;letter-spacing:.16em;
+  color:var(--dimmer);text-transform:uppercase;margin-bottom:6px;display:block;
+}
+.pills{display:flex;flex-wrap:wrap;gap:5px}
+.pill{
+  padding:4px 11px;border-radius:7px;border:1px solid var(--line);background:var(--surface);
+  color:var(--dim);font-size:12.5px;transition:.15s;
+}
+.pill.on{background:var(--surface2);border-color:var(--gold);color:var(--gold)}
+select.sel{
+  width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  padding:8px 10px;outline:none;font-size:13.5px;
+}
+.clearbtn{font-size:12.5px;color:var(--chili);text-decoration:underline;text-underline-offset:3px;padding:4px 0}
+
+/* ---------- results bar ---------- */
+.resbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0 10px;flex-wrap:wrap}
+.rescount{font-size:13px;color:var(--dim)}
+.rescount b{font-family:'Chakra Petch',sans-serif;color:var(--ink);font-size:15px}
+.sortsel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12.5px;outline:none}
+
+/* ---------- cards ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:12px;padding-bottom:40px}
+.card{
+  position:relative;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r);padding:16px 16px 14px;cursor:pointer;
+  transition:transform .16s cubic-bezier(.2,.7,.3,1),border-color .16s,background .16s;
+  overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--tier,var(--dimmer));
+  opacity:.75;transition:opacity .16s;
+}
+.card:hover{transform:translateY(-3px);border-color:var(--dimmer);background:var(--surface2)}
+.card:hover::before{opacity:1}
+.card.done{opacity:.5}
+.chead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:3px}
+.cname{font-family:'Trirong',serif;font-weight:600;font-size:19px;line-height:1.28;margin:0;letter-spacing:-.005em}
+.seal{
+  flex:none;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:13px;
+  width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  border:1.5px solid var(--tier);color:var(--tier);
+  background:color-mix(in srgb,var(--tier) 11%,transparent);
+  transform:rotate(-6deg);letter-spacing:-.02em;
+}
+.cmeta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;color:var(--dim);margin-bottom:10px}
+.cmeta .dot{width:3px;height:3px;border-radius:50%;background:var(--dimmer)}
+.openbadge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:1px 8px 1px 6px;border-radius:999px}
+.openbadge.open{color:var(--jade);background:rgba(86,165,138,.12);border:1px solid rgba(86,165,138,.35)}
+.openbadge.soon{color:var(--gold);background:rgba(226,176,74,.14);border:1px solid rgba(226,176,74,.4)}
+.openbadge.closed{color:var(--chili);background:rgba(217,97,74,.1);border:1px solid rgba(217,97,74,.3)}
+.openbadge .dotlive{width:6px;height:6px;border-radius:50%;background:currentColor}
+.chours{font-size:12px;color:var(--dim);margin:-2px 0 10px}
+.ctag{
+  display:inline-block;font-size:11px;color:var(--gold);
+  border:1px solid rgba(226,176,74,.3);background:rgba(226,176,74,.07);
+  border-radius:5px;padding:1px 7px;
+}
+.rsvbadge{
+  display:inline-block;font-size:11px;color:var(--sky);
+  border:1px solid rgba(127,163,201,.35);background:rgba(127,163,201,.08);
+  border-radius:5px;padding:1px 7px;
+}
+.cwhy{font-size:13.5px;color:#c3c9d4;margin:0 0 11px;line-height:1.55;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cmenu{
+  font-size:12.5px;color:var(--jade);background:rgba(86,165,138,.07);
+  border-left:2px solid rgba(86,165,138,.4);padding:5px 9px;border-radius:0 6px 6px 0;
+  margin-bottom:12px;line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.cfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.cbudget{font-family:'Chakra Petch',sans-serif;font-size:13px;color:var(--ink)}
+.cbudget span{font-size:11px;color:var(--dimmer);margin-left:2px}
+.cacts{display:flex;gap:5px}
+.act{
+  width:31px;height:31px;border-radius:8px;border:1px solid var(--line);
+  display:grid;place-items:center;color:var(--dim);transition:.14s;background:var(--bg);
+}
+.act:hover{border-color:var(--dimmer);color:var(--ink)}
+.act.fav.on{color:var(--gold);border-color:rgba(226,176,74,.45);background:rgba(226,176,74,.1)}
+.act.chk.on{color:var(--jade);border-color:rgba(86,165,138,.45);background:rgba(86,165,138,.1)}
+.daysel{
+  background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--dim);
+  font-size:11px;padding:0 5px;height:31px;outline:none;
+}
+.daytabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.daytab{
+  padding:6px 14px;border-radius:9px;border:1px solid var(--line);background:var(--surface);
+  color:var(--dim);font-size:13px;font-weight:600;transition:.15s;
+}
+.daytab.on{background:var(--gold);border-color:var(--gold);color:#12141a}
+.daytab.add{
+  border-style:dashed;color:var(--dimmer);font-weight:400;padding:6px 12px;
+}
+.daytab.add:hover{color:var(--gold);border-color:var(--gold)}
+
+.empty{text-align:center;padding:64px 20px;color:var(--dim)}
+.empty h3{font-family:'Trirong',serif;font-size:21px;color:var(--ink);margin:0 0 7px}
+.empty button{margin-top:14px;background:var(--gold);color:#12141a;font-weight:600;padding:9px 20px;border-radius:9px}
+
+/* ---------- modal ---------- */
+.scrim{
+  position:fixed;inset:0;z-index:100;background:rgba(8,9,12,.72);backdrop-filter:blur(4px);
+  display:none;align-items:flex-end;justify-content:center;
+}
+.scrim.open{display:flex}
+.sheet{
+  background:var(--surface);width:100%;max-width:620px;max-height:90vh;overflow-y:auto;
+  border-radius:20px 20px 0 0;border:1px solid var(--line);border-bottom:none;
+  padding:0 0 calc(22px + env(safe-area-inset-bottom));box-shadow:var(--shadow);
+  animation:up .26s cubic-bezier(.2,.75,.3,1);
+}
+@keyframes up{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}
+.shead{position:sticky;top:0;background:var(--surface);padding:16px 20px 12px;border-bottom:1px solid var(--line);z-index:2}
+.shandle{width:36px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 13px}
+.stitle{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.stitle h2{font-family:'Trirong',serif;font-weight:700;font-size:24px;margin:0 0 5px;line-height:1.25}
+.sbody{padding:16px 20px 0}
+.srow{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+.srow:last-of-type{border-bottom:none}
+.srow dt{
+  flex:none;width:82px;font-family:'Chakra Petch',sans-serif;font-size:11px;
+  letter-spacing:.1em;color:var(--dimmer);text-transform:uppercase;padding-top:3px;
+}
+.srow dd{margin:0;flex:1;line-height:1.6}
+.hl{color:var(--jade)}
+.sbtns{display:flex;gap:8px;padding:16px 20px 0}
+.btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:12px;border-radius:11px;font-size:14px;font-weight:600;transition:.15s;
+  text-decoration:none;
+}
+.btn-p{background:var(--gold);color:#12141a}
+.btn-p:hover{background:#eec063}
+.btn-s{background:var(--surface2);border:1px solid var(--line);color:var(--ink)}
+.btn-s:hover{border-color:var(--dimmer)}
+.btn-s.on{border-color:var(--gold);color:var(--gold)}
+
+/* ---------- plan / tier view ---------- */
+.planzone{margin-bottom:22px}
+.planzone h4{
+  font-family:'Chakra Petch',sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold);margin:0 0 9px;display:flex;align-items:center;gap:9px;
+}
+.planzone h4::after{content:'';flex:1;height:1px;background:var(--line)}
+.planzone h4 .seal-mini{
+  flex:none;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:11px;
+  width:22px;height:22px;border-radius:6px;display:grid;place-items:center;
+  border:1.5px solid var(--tt,var(--gold));color:var(--tt,var(--gold));
+  background:color-mix(in srgb,var(--tt,var(--gold)) 14%,transparent);
+}
+
+/* ---------- map view ---------- */
+.mapwrap{display:none;padding-bottom:40px}
+.mapwrap.on{display:block}
+.maptoolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.maptbtn{
+  display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:9px;
+  border:1px solid var(--line);background:var(--surface);color:var(--dim);font-size:12.5px;transition:.15s;
+}
+.maptbtn:hover{border-color:var(--dimmer);color:var(--ink)}
+.maptbtn.on{background:rgba(86,165,138,.14);border-color:var(--jade);color:var(--jade)}
+.maptbtn .dotlive{width:7px;height:7px;border-radius:50%;background:currentColor}
+.maptbtn.on .dotlive{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.6)}}
+#leafmap{
+  width:100%;height:52vh;min-height:340px;border-radius:var(--r);border:1px solid var(--line);
+  background:var(--surface);
+}
+.leaflet-popup-content-wrapper{background:var(--surface2);color:var(--ink);border-radius:10px}
+.leaflet-popup-tip{background:var(--surface2)}
+.leaflet-popup-content{font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;margin:10px 12px}
+.popname{font-family:'Trirong',serif;font-weight:600;font-size:15px;margin-bottom:3px}
+.popmeta{color:var(--dim);font-size:11.5px;margin-bottom:6px}
+.poplink{color:var(--gold);font-size:12px;text-decoration:underline}
+.pin-num{
+  background:var(--gold);color:#12141a;border-radius:50%;width:22px;height:22px;
+  display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;
+  font-weight:700;font-size:11px;border:2px solid #12141a;box-shadow:0 2px 6px rgba(0,0,0,.4);
+}
+.routepanel{margin-top:16px}
+.routecard{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;
+}
+.routecard h5{
+  font-family:'Chakra Petch',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);margin:0 0 10px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+}
+.routecard h5::after{content:'';flex:1;height:1px;background:var(--line);min-width:14px}
+.routestat{
+  font-family:'Chakra Petch',sans-serif;font-size:11px;color:var(--jade);text-transform:none;
+  letter-spacing:0;background:rgba(86,165,138,.1);border:1px solid rgba(86,165,138,.3);
+  border-radius:6px;padding:2px 8px;white-space:nowrap;
+}
+.routestat.wait{color:var(--dimmer);background:transparent;border-color:var(--line)}
+.routelist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.routelist li{display:flex;align-items:flex-start;gap:10px;font-size:13.5px}
+.routelist .rn{
+  flex:none;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#12141a;
+  display:grid;place-items:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:11px;margin-top:1px;
+}
+.routelist .rname{font-weight:600}
+.routelist .rmeta{color:var(--dim);font-size:12px}
+.routebtn{
+  margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;width:100%;
+  background:var(--gold);color:#12141a;font-weight:600;padding:10px;border-radius:9px;font-size:13.5px;
+  text-decoration:none;
+}
+.routebtnrow{display:flex;gap:8px;margin-top:12px}
+.routebtnrow .routebtn{margin-top:0;flex:1}
+.previewbtn{
+  background:var(--surface2);color:var(--ink);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;gap:6px;flex:none;width:44px;border-radius:9px;
+}
+.previewbtn:hover{border-color:var(--gold);color:var(--gold)}
+.mapempty{text-align:center;padding:40px 20px;color:var(--dim);font-size:13.5px}
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(70px);
+  background:var(--ink);color:#12141a;padding:10px 20px;border-radius:999px;
+  font-size:13.5px;font-weight:600;z-index:200;opacity:0;transition:.28s cubic-bezier(.2,.75,.3,1);
+  box-shadow:var(--shadow);pointer-events:none;
+}
+.toast.show{transform:translateX(-50%);opacity:1}
+footer{border-top:1px solid var(--line);padding:22px 0 34px;color:var(--dimmer);font-size:12px;line-height:1.7}
+footer a{color:var(--dim)}
+@media (min-width:640px){
+  .scrim{align-items:center;padding:24px}
+  .sheet{border-radius:18px;border-bottom:1px solid var(--line);max-height:84vh;padding-bottom:22px}
+  .shandle{display:none}
+  .shead{padding-top:20px}
+}
+@media (max-width:640px){
+  .glance{display:none}
+}
+@media (max-width:520px){
+  header{padding:20px 0 12px}
+  .lede{font-size:13.5px;margin-bottom:10px}
+  .iconbtn{width:41px;height:41px}
+  .grid{grid-template-columns:1fr}
+  .srow{flex-direction:column;gap:3px}
+  .srow dt{width:auto}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="herotext">
+    <div class="eyebrow">CNX Guide · 2026</div>
+    <h1>กินอะไรดี<br><em>เชียงใหม่</em></h1>
+    <p class="lede">คัดเฉพาะร้านที่มีเหตุผลให้ไปจริง — ร้านลับ ร้านเจ้าเก่า specialty coffee บาร์ค็อกเทลเด็ด และร้านที่คนเชียงใหม่กินเอง กรองก่อนออกจากบ้าน แล้วกดไป Google Maps ได้เลย</p>
+    <p class="statline"><b id="stTotal">0</b> ร้าน &nbsp;·&nbsp; <b id="stTop">0</b> อันดับ S+/S &nbsp;·&nbsp; <b id="stZone">0</b> โซนทั่วเชียงใหม่</p>
+  </div>
+  <div class="glance" id="glancePanel">
+    <div class="glancerow">
+      <span class="gdot"></span>
+      <span><b id="gOpen">0</b> ร้านเปิดอยู่ตอนนี้</span>
+    </div>
+    <div class="glancerow">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <span><b id="gReserve">0</b> ร้านรับจองล่วงหน้า</span>
+    </div>
+    <div class="glancerow">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+      <span><b id="gZone2">0</b> โซนทั่วเชียงใหม่</span>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="searchrow">
+    <label class="search">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.1" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="ค้นชื่อร้าน เมนู หรือโซน…" autocomplete="off">
+    </label>
+    <button class="iconbtn" id="btnFilter" title="ตัวกรองเพิ่มเติม" aria-label="ตัวกรองเพิ่มเติม">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+    </button>
+    <button class="iconbtn" id="btnPlan" title="แผนของฉัน" aria-label="แผนของฉัน">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7.9 5.3-4.6-2.5-4.6 2.5.9-5.3L4.5 9.6l5.2-.7z"/></svg>
+      <span class="badge" id="favCount" hidden>0</span>
+    </button>
+    <button class="iconbtn dice" id="btnRandom" title="สุ่มร้าน" aria-label="สุ่มร้าน">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8.5" cy="8.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>
+    </button>
+  </div>
+
+  <div class="tabs" id="viewTabs">
+    <button class="tab on" data-view="grid">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      รายการร้าน
+    </button>
+    <button class="tab" data-view="map">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 18l-5 2V6l5-2 6 2 5-2v14l-5 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>
+      แผนที่ &amp; เส้นทาง
+    </button>
+  </div>
+
+  <div class="chips" id="catChips"></div>
+
+  <div class="filters" id="filters">
+    <div class="fgroup">
+      <span class="flabel">ระดับความน่าไป</span>
+      <div class="pills" id="tierPills"></div>
+    </div>
+    <div class="fgroup">
+      <span class="flabel">โซน</span>
+      <select class="sel" id="areaSel"></select>
+    </div>
+    <div class="fgroup">
+      <span class="flabel">งบต่อคน ไม่เกิน</span>
+      <div class="pills" id="budgetPills"></div>
+    </div>
+    <div class="fgroup">
+      <span class="flabel">อื่นๆ</span>
+      <div class="pills">
+        <button class="pill" id="pillOpenNow">🟢 เปิดอยู่ตอนนี้</button>
+        <button class="pill" id="pillReserve">📅 รับจองได้</button>
+        <button class="pill" id="pillNearMe">📍 ใกล้ฉัน</button>
+      </div>
+    </div>
+    <div class="fgroup" style="flex:0 0 auto;min-width:auto;display:flex;align-items:flex-end">
+      <button class="clearbtn" id="btnClear">ล้างตัวกรองทั้งหมด</button>
+    </div>
+  </div>
+</div>
+
+<div class="resbar">
+  <div class="rescount" id="resCount"></div>
+  <select class="sortsel" id="sortSel">
+    <option value="tier">เรียง: ระดับ S+ ก่อน</option>
+    <option value="cheap">เรียง: งบน้อยไปมาก</option>
+    <option value="rich">เรียง: งบมากไปน้อย</option>
+    <option value="name">เรียง: ชื่อ ก–ฮ</option>
+    <option value="zone">เรียง: ตามโซน</option>
+  </select>
+</div>
+
+<div id="view"></div>
+
+<div class="mapwrap" id="mapwrap">
+  <div id="mapDayTabs"></div>
+  <div class="maptoolbar">
+    <button class="maptbtn" id="btnLiveLoc">
+      <span class="dotlive"></span>
+      <span id="liveLocLabel">ติดตามตำแหน่งฉันสด</span>
+    </button>
+  </div>
+  <div id="leafmap"></div>
+  <div class="routepanel" id="routePanel"></div>
+</div>
+
+<footer>
+  <p>ข้อมูลรวบรวมจาก Michelin Guide Chiang Mai 2026 · The Way to Coffee · Top Tables 2026 · Tripadvisor · Wongnai · Google Maps<br>
+  เวลาเปิด–ปิดและวันหยุดของร้านเล็กเปลี่ยนบ่อย <strong>ควรกดเช็ก Google Maps ก่อนออกเดินทางทุกครั้ง</strong></p>
+  <p>รายการโปรดและร้านที่ไปแล้วถูกเก็บไว้ในเครื่องของคุณเท่านั้น ไม่ได้ส่งไปที่ไหน</p>
+</footer>
+
+</div>
+
+<div class="scrim" id="scrim"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const DATA = [{"id":0,"cat":"Cafe & Coffee","name":"Taste Cafe","zone":"สุเทพ/หลัง มช.","area":"มช. / สุเทพ","tier":"S+","tag":"Local Favorite","why":"กาแฟ specialty ร้านเล็กที่สายกาแฟเชียงใหม่แวะซ้ำ","menu":"Dirty, Flat White, Filter","budget":"80–200","bmin":80,"bmax":200,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน/จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7951532,98.9630932&query_place_id=ChIJUTG_o2Q62jARhwAExQdn8S4","lat":18.7951532,"lng":98.9630932,"approx":false,"hours_disp":"ทุกวัน 07:00–17:00","sched":[[[420,1020]],[[420,1020]],[[420,1020]],[[420,1020]],[[420,1020]],[[420,1020]],[[420,1020]]],"phone":"+66 65 605 2567","reserve":false},{"id":1,"cat":"Cafe & Coffee","name":"Asama Coffee & Roastery","zone":"เชียงใหม่เลคแลนด์","area":"เหนือเมือง / แม่ริม","tier":"S+","tag":"Local Legend","why":"หนึ่งในร้านกาแฟรุ่นบุกเบิก บรรยากาศริมบึงและงานคั่วจริงจัง","menu":"Gravity, Piccolo Latte, Drip","budget":"100–250","bmin":100,"bmax":250,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มีพื้นที่ใกล้ร้าน","map":"https://www.google.com/maps/search/?api=1&query=18.7650239,98.9531644&query_place_id=ChIJN9kSX5Ew2jAR9mn7yVwVPo0","lat":18.7650239,"lng":98.9531644,"approx":false,"hours_disp":"ทุกวัน 08:00–17:00","sched":[[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]]],"phone":"+66 81 530 5388","reserve":false},{"id":2,"cat":"Cafe & Coffee","name":"Roast8ry Flagship Store","zone":"นิมมาน","area":"นิมมาน / สันติธรรม","tier":"S+","tag":"World-class Specialty","why":"กาแฟระดับแชมป์โลก เทคนิคและเมนู signature โดดเด่น","menu":"Satan Latte, Ficardie","budget":"120–300","bmin":120,"bmax":300,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จอดยาก","map":"https://www.google.com/maps/search/?api=1&query=18.7948778,98.9684847&query_place_id=ChIJUwbvRP072jARfsOb81lnJFQ","lat":18.7948778,"lng":98.9684847,"approx":false,"hours_disp":"ทุกวัน 08:00–17:00","sched":[[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]]],"phone":"+66 61 685 4165","reserve":false},{"id":3,"cat":"Cafe & Coffee","name":"Akha Ama Coffee La Fattoria","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"S","tag":"Thai Coffee Pioneer","why":"เมล็ดไทยคุณภาพสูงและโมเดลสนับสนุนชุมชนอาข่า","menu":"Pour Over, Thai Single Origin","budget":"80–220","bmin":80,"bmax":220,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7883705,98.9831919&query_place_id=ChIJkZyVmJs62jARav_dgGLEBr0","lat":18.7883705,"lng":98.9831919,"approx":true,"hours_disp":"ทุกวัน 08:00–18:00","sched":[[[480,1080]],[[480,1080]],[[480,1080]],[[480,1080]],[[480,1080]],[[480,1080]],[[480,1080]]],"phone":"+66 88 267 8014","reserve":false},{"id":4,"cat":"Cafe & Coffee","name":"Ministry of Roasters","zone":"ตัวเมือง","area":"เมืองเก่า / ท่าแพ","tier":"S","tag":"Roaster Favorite","why":"คั่วและชงแม่น เหมาะกับคนจริงจังเรื่องโปรไฟล์กาแฟ","menu":"Filter Flight, Espresso","budget":"100–280","bmin":100,"bmax":280,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7897446,98.9961516&query_place_id=ChIJQx8cdeI72jARR2fTwhen08Y","lat":18.7897446,"lng":98.9961516,"approx":false,"hours_disp":"ทุกวัน 07:30–17:00","sched":[[[450,1020]],[[450,1020]],[[450,1020]],[[450,1020]],[[450,1020]],[[450,1020]],[[450,1020]]],"phone":"+66 65 643 0245","reserve":false},{"id":5,"cat":"Cafe & Coffee","name":"GRAPH One Nimman","zone":"นิมมาน","area":"นิมมาน / สันติธรรม","tier":"S","tag":"Creative Coffee","why":"เมนูกาแฟสร้างสรรค์และเอกลักษณ์แบรนด์ชัด","menu":"Monochrome, Lost Garden","budget":"120–280","bmin":120,"bmax":280,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"One Nimman","map":"https://www.google.com/maps/search/?api=1&query=18.7999212,98.9681402&query_place_id=ChIJw5T0TM072jAR408yNwb8Nbk","lat":18.7999212,"lng":98.9681402,"approx":false,"hours_disp":"ทุกวัน 11:00–22:00","sched":[[[660,1320]],[[660,1320]],[[660,1320]],[[660,1320]],[[660,1320]],[[660,1320]],[[660,1320]]],"reserve":false},{"id":6,"cat":"Cafe & Coffee","name":"Gateway Coffee Roaster","zone":"ท่าแพ","area":"เมืองเก่า / ท่าแพ","tier":"S","tag":"Local Specialty","why":"กาแฟคั่วเองในตึกเก่า คุณภาพดีและบรรยากาศมีเสน่ห์","menu":"Dirty, Espresso Tonic","budget":"90–220","bmin":90,"bmax":220,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.788342,98.996096&query_place_id=ChIJfXJuiaM62jARwe4HUsDzBes","lat":18.788342,"lng":98.996096,"approx":false,"sched":null,"reserve":false},{"id":7,"cat":"Cafe & Coffee","name":"Toffee Roasters","zone":"ตัวเมือง","area":"เมืองเก่า / ท่าแพ","tier":"A+","tag":"Coffee Nerd Pick","why":"โดดเด่นด้านเมล็ดและ filter coffee","menu":"Filter, Espresso","budget":"100–250","bmin":100,"bmax":250,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7985883,98.967479&query_place_id=ChIJFWmjeaUx2jARrW4Kz6DOWLQ","lat":18.7985883,"lng":98.967479,"approx":false,"hours_disp":"ทุกวัน 07:00–16:00","sched":[[[420,960]],[[420,960]],[[420,960]],[[420,960]],[[420,960]],[[420,960]],[[420,960]]],"phone":"+66 64 998 9929","reserve":false},{"id":8,"cat":"Cafe & Coffee","name":"Kurokuro Coffee Roaster","zone":"ตัวเมือง","area":"เมืองเก่า / ท่าแพ","tier":"A+","tag":"Hidden Specialty","why":"ร้านเล็ก งานกาแฟดำและการคั่วจริงจัง","menu":"Americano, Filter","budget":"90–220","bmin":90,"bmax":220,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7940796,98.9944403&query_place_id=ChIJRcobPgA72jAR-87gvmvIWP0","lat":18.7940796,"lng":98.9944403,"approx":false,"hours_disp":"จ-ส 08:00–17:00 · ปิดวันอา","sched":[[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]],null],"phone":"+66 87 356 6466","reserve":false},{"id":9,"cat":"Cafe & Coffee","name":"Pegasus Café & Roastery","zone":"ตัวเมือง","area":"เมืองเก่า / ท่าแพ","tier":"A+","tag":"Local Roaster","why":"โรงคั่วที่มีฐานลูกค้าสายกาแฟและเมล็ดหลากหลาย","menu":"House Blend, Pour Over","budget":"90–240","bmin":90,"bmax":240,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"แตกต่างตามสาขา","map":"https://www.google.com/maps/search/?api=1&query=18.7852092,98.9872138&query_place_id=ChIJVdCVhvU72jAR4oxFpfC2Ocg","lat":18.7852092,"lng":98.9872138,"approx":false,"hours_disp":"ปิดวันพ · พฤ-อ 08:30–16:30","sched":[[[510,990]],[[510,990]],null,[[510,990]],[[510,990]],[[510,990]],[[510,990]]],"phone":"+66 53 273 272","reserve":false},{"id":10,"cat":"Cafe & Coffee","name":"Maled Coffee Roasters","zone":"สุเทพ","area":"มช. / สุเทพ","tier":"A+","tag":"Thai Bean Specialist","why":"เด่นเรื่องเมล็ดไทยและการดึงคาแรกเตอร์ออกมาชัด","menu":"Pour Over, Espresso","budget":"90–230","bmin":90,"bmax":230,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7897041,98.9624077&query_place_id=ChIJdzmGkns62jARwQV4eGmoUHs","lat":18.7897041,"lng":98.9624077,"approx":false,"hours_disp":"ทุกวัน 07:00–17:00","sched":[[[420,1020]],[[420,1020]],[[420,1020]],[[420,1020]],[[420,1020]],[[420,1020]],[[420,1020]]],"phone":"+66 99 295 5655","reserve":false},{"id":11,"cat":"Cafe & Coffee","name":"The Baristro at Ping River","zone":"ริมปิง","area":"ริมปิง / วัดเกต","tier":"A","tag":"Coffee + Atmosphere","why":"ดีไซน์สวยแต่กาแฟยังแข็งแรง","menu":"Dirty, Black Coconut","budget":"100–280","bmin":100,"bmax":280,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มีแต่เต็มเร็ว","map":"https://www.google.com/maps/search/?api=1&query=18.81582,99.00025&query_place_id=ChIJS8TPyvk72jARhJnllxbwfh4","lat":18.81582,"lng":99.00025,"approx":false,"hours_disp":"ทุกวัน 08:00–18:00","sched":[[[480,1080]],[[480,1080]],[[480,1080]],[[480,1080]],[[480,1080]],[[480,1080]],[[480,1080]]],"phone":"+66 87 788 2788","reserve":false},{"id":12,"cat":"Cafe & Coffee","name":"Akha Ama Living Factory","zone":"แม่ริม","area":"เหนือเมือง / แม่ริม","tier":"A","tag":"Destination Coffee","why":"โรงคั่วบรรยากาศสงบ เหมาะลองเมล็ดไทย","menu":"Filter, Espresso","budget":"100–260","bmin":100,"bmax":260,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี","map":"https://www.google.com/maps/search/?api=1&query=18.9444075,98.9185954&query_place_id=ChIJtalF83M-2jARvs1kVRVBw8s","lat":18.9444075,"lng":98.9185954,"approx":false,"hours_disp":"ปิดวันพ · พฤ-อ 09:00–17:00","sched":[[[540,1020]],[[540,1020]],null,[[540,1020]],[[540,1020]],[[540,1020]],[[540,1020]]],"phone":"+66 88 267 8014","reserve":false},{"id":13,"cat":"Cafe & Coffee","name":"Brewginning Coffee","zone":"ช้างม่อย","area":"เมืองเก่า / ท่าแพ","tier":"A","tag":"Popular Specialty","why":"ตึกเก่ามีเสน่ห์และกาแฟมีมาตรฐาน","menu":"Dirty, Cold Brew","budget":"90–230","bmin":90,"bmax":230,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7902932,98.9948088&query_place_id=ChIJhap_BPA72jARZWkFGJIlQw8","lat":18.7902932,"lng":98.9948088,"approx":false,"hours_disp":"ทุกวัน 07:00–19:00","sched":[[[420,1140]],[[420,1140]],[[420,1140]],[[420,1140]],[[420,1140]],[[420,1140]],[[420,1140]]],"reserve":false},{"id":14,"cat":"Cafe & Coffee","name":"Fohhide","zone":"ตัวเมือง","area":"เมืองเก่า / ท่าแพ","tier":"A","tag":"Hidden Coffee Bar","why":"ประสบการณ์หน้าเคาน์เตอร์และกาแฟคุณภาพสูง","menu":"Signature, Filter","budget":"100–260","bmin":100,"bmax":260,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7987423,98.968686&query_place_id=ChIJyz5Ur0E72jAR60Ig88vBs54","lat":18.7987423,"lng":98.968686,"approx":false,"hours_disp":"จ-พฤ 08:00–17:00 · ศ-อา 08:00–18:00","sched":[[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]],[[480,1080]],[[480,1080]],[[480,1080]]],"phone":"+66 83 236 5442","reserve":false},{"id":15,"cat":"Cafe & Coffee","name":"Three Nakhanik","zone":"ทิพย์เนตร","area":"ใต้เมือง / หางดง","tier":"A","tag":"Modern Specialty","why":"หนึ่งในร้านที่คู่มือกาแฟล่าสุดพูดถึง","menu":"Cold Brew, Drip","budget":"90–230","bmin":90,"bmax":230,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7777689,98.9809745&query_place_id=ChIJJ3setZDK2zAR44MDk0ZQSs4","lat":18.7777689,"lng":98.9809745,"approx":false,"hours_disp":"จ·อ 08:33–14:34 · ปิดวันพ · พฤ·ศ 08:33–14:34 · ส·อา 08:33–15:45","sched":[[[513,874]],[[513,874]],null,[[513,874]],[[513,874]],[[513,945]],[[513,945]]],"phone":"+66 63 458 5164","reserve":false},{"id":16,"cat":"Cafe & Coffee","name":"Gallery Drip","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"A","tag":"Drip Specialist","why":"เหมาะกับคนชอบกาแฟดริปและบรรยากาศสงบ","menu":"Drip Coffee","budget":"100–250","bmin":100,"bmax":250,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7902126,98.986684&query_place_id=ChIJQ57KIiU72jAREXGYqdZ3wEY","lat":18.7902126,"lng":98.986684,"approx":false,"hours_disp":"ปิดวันจ·อ · พ-อา 09:00–17:00","sched":[null,null,[[540,1020]],[[540,1020]],[[540,1020]],[[540,1020]],[[540,1020]]],"phone":"+66 82 545 6392","reserve":false},{"id":17,"cat":"Cafe & Coffee","name":"Caramellow Cafe","zone":"มหิดล","area":"ใต้เมือง / หางดง","tier":"A","tag":"All-round Cafe","why":"กาแฟ อาหารเช้า และเค้กทำได้ดีครบ","menu":"Caramel Latte, Cake","budget":"150–450","bmin":150,"bmax":450,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี","map":"https://www.google.com/maps/search/?api=1&query=18.768318,98.9809659&query_place_id=ChIJ36Nwxscx2jARH63elgQPQv8","lat":18.768318,"lng":98.9809659,"approx":false,"hours_disp":"ทุกวัน 09:00–19:00","sched":[[[540,1140]],[[540,1140]],[[540,1140]],[[540,1140]],[[540,1140]],[[540,1140]],[[540,1140]]],"phone":"+66 53 284 114","reserve":false},{"id":18,"cat":"Cafe & Coffee","name":"Fern Forest Cafe","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"A","tag":"Classic Garden Cafe","why":"ร้านสวนเก่าแก่ ขนมและอาหารไว้ใจได้","menu":"Carrot Cake, Coffee","budget":"150–450","bmin":150,"bmax":450,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7933635,98.982022&query_place_id=ChIJ2xINj5o62jARvGTpW7fWjts","lat":18.7933635,"lng":98.982022,"approx":false,"hours_disp":"ทุกวัน 08:00–20:00","sched":[[[480,1200]],[[480,1200]],[[480,1200]],[[480,1200]],[[480,1200]],[[480,1200]],[[480,1200]]],"phone":"+66 84 616 1144","reserve":false},{"id":19,"cat":"Cafe & Coffee","name":"Woo Cafe","zone":"วัดเกต","area":"ริมปิง / วัดเกต","tier":"A","tag":"Cafe + Dining","why":"อาหาร ขนม และบรรยากาศทำได้ดีครบ","menu":"Cake, Coffee","budget":"250–750","bmin":250,"bmax":750,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=Woo+Cafe+Chiang+Mai","lat":18.792,"lng":99.003,"approx":true,"sched":null,"reserve":false},{"id":20,"cat":"Breakfast & Brunch","name":"Bakefast","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"S+","tag":"Must Brunch","why":"ร้าน brunch ที่ผู้ใช้ระบุและควรเพิ่มในลิสต์เด็ด","menu":"Croissant Sandwich, Egg Dishes, Coffee","budget":"200–500","bmin":200,"bmax":500,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ตรวจสอบ Maps","map":"https://www.google.com/maps/search/?api=1&query=Bakefast+Chiang+Mai","lat":18.7883,"lng":98.9853,"approx":true,"sched":null,"reserve":false},{"id":21,"cat":"Breakfast & Brunch","name":"The Hideout","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"S","tag":"Brunch Favorite","why":"ร้านอาหารเช้าที่มีรีวิวระยะยาวแข็งแรง","menu":"Avocado Toast, Pancake, Breakfast Plate","budget":"180–450","bmin":180,"bmax":450,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7936639,98.9945402&query_place_id=ChIJLVvEw7w62jAReMZHpG9iVVA","lat":18.7936639,"lng":98.9945402,"approx":false,"hours_disp":"ปิดวันจ · อ-อา 08:00–17:00","sched":[null,[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]],[[480,1020]]],"phone":"+66 81 960 3889","reserve":false},{"id":22,"cat":"Breakfast & Brunch","name":"Caramellow Cafe","zone":"มหิดล","area":"ใต้เมือง / หางดง","tier":"S","tag":"All-round Breakfast","why":"อาหารเช้า เค้ก และกาแฟครบ","menu":"Breakfast Plate, Cake","budget":"200–500","bmin":200,"bmax":500,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี","map":"https://www.google.com/maps/search/?api=1&query=18.768318,98.9809659&query_place_id=ChIJ36Nwxscx2jARH63elgQPQv8","lat":18.768318,"lng":98.9809659,"approx":false,"hours_disp":"ทุกวัน 09:00–19:00","sched":[[[540,1140]],[[540,1140]],[[540,1140]],[[540,1140]],[[540,1140]],[[540,1140]],[[540,1140]]],"phone":"+66 53 284 114","reserve":false},{"id":23,"cat":"Breakfast & Brunch","name":"Thaan Aoan","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"S","tag":"Thai + Western Breakfast","why":"เปิดเช้าและมีทั้งอาหารไทยกับตะวันตก","menu":"Breakfast, Thai Dishes","budget":"180–500","bmin":180,"bmax":500,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7855709,98.9884105&query_place_id=ChIJ6yBbIp862jAR7qYMN888EzA","lat":18.7855709,"lng":98.9884105,"approx":false,"hours_disp":"ทุกวัน 07:00–21:00","sched":[[[420,1260]],[[420,1260]],[[420,1260]],[[420,1260]],[[420,1260]],[[420,1260]],[[420,1260]]],"phone":"+66 92 613 0320","reserve":false},{"id":24,"cat":"Breakfast & Brunch","name":"KLĀY","zone":"นิมมาน","area":"นิมมาน / สันติธรรม","tier":"A+","tag":"Modern Brunch","why":"บรันช์หน้าตาดีและกาแฟครบ","menu":"Egg Dishes, Toast, Coffee","budget":"250–600","bmin":250,"bmax":600,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7985035,98.9686053&query_place_id=ChIJIwdqWq472jARU53vPN57PVg","lat":18.7985035,"lng":98.9686053,"approx":false,"hours_disp":"ทุกวัน 08:30–18:00","sched":[[[510,1080]],[[510,1080]],[[510,1080]],[[510,1080]],[[510,1080]],[[510,1080]],[[510,1080]]],"phone":"+66 81 324 9526","reserve":false},{"id":25,"cat":"Breakfast & Brunch","name":"Goodsouls Kitchen","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"A+","tag":"Plant-based","why":"อาหารเช้าและ brunch สายสุขภาพที่นิยมมาก","menu":"Smoothie Bowl, Vegan Breakfast","budget":"200–500","bmin":200,"bmax":500,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7931734,98.9820563&query_place_id=ChIJky7veJA62jARE5oIozAwUqw","lat":18.7931734,"lng":98.9820563,"approx":false,"hours_disp":"ทุกวัน 08:00–22:00","sched":[[[480,1320]],[[480,1320]],[[480,1320]],[[480,1320]],[[480,1320]],[[480,1320]],[[480,1320]]],"phone":"+66 88 819 9669","reserve":false},{"id":26,"cat":"Breakfast & Brunch","name":"Bella Goose Cafe","zone":"ช้างคลาน","area":"ช้างคลาน / ไนท์บาซาร์","tier":"A+","tag":"Early Coffee Brunch","why":"กาแฟ specialty และอาหารเช้า","menu":"Breakfast Plate, Coffee","budget":"180–450","bmin":180,"bmax":450,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7813234,98.9989703&query_place_id=ChIJ4S28d6c62jARsxFsKPSbiZY","lat":18.7813234,"lng":98.9989703,"approx":false,"hours_disp":"ทุกวัน 07:00–16:00","sched":[[[420,960]],[[420,960]],[[420,960]],[[420,960]],[[420,960]],[[420,960]],[[420,960]]],"phone":"+66 92 564 2708","reserve":false},{"id":27,"cat":"Breakfast & Brunch","name":"The Bowl Spot","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"A","tag":"Healthy Bowl","why":"เหมาะสายผลไม้ โยเกิร์ต และอาหารเช้าเบาๆ","menu":"Smoothie Bowl, Granola","budget":"180–400","bmin":180,"bmax":400,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.798362,98.9686396&query_place_id=ChIJ4RheUrw72jARdB04U0qsL7g","lat":18.798362,"lng":98.9686396,"approx":false,"hours_disp":"พ 11:00–22:00 · พฤ-อ 08:00–22:00","sched":[[[480,1320]],[[480,1320]],[[660,1320]],[[480,1320]],[[480,1320]],[[480,1320]],[[480,1320]]],"phone":"+66 91 850 5558","reserve":false},{"id":28,"cat":"Breakfast & Brunch","name":"Butter is Better","zone":"ช้างคลาน","area":"ช้างคลาน / ไนท์บาซาร์","tier":"A","tag":"American Diner","why":"อาหารเช้าแบบอเมริกันและเบเกอรี่","menu":"Pancake, American Breakfast","budget":"220–550","bmin":220,"bmax":550,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี/ใกล้ร้าน","map":"https://www.google.com/maps/search/?api=1&query=18.7803877,98.9997558&query_place_id=ChIJH58OiKc62jARaNwPCIcMMdk","lat":18.7803877,"lng":98.9997558,"approx":false,"hours_disp":"ปิดวันอ · พ-จ 08:00–16:30","sched":[[[480,990]],null,[[480,990]],[[480,990]],[[480,990]],[[480,990]],[[480,990]]],"phone":"+66 53 820 761","reserve":false},{"id":29,"cat":"Breakfast & Brunch","name":"Bagel House Cafe","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"A","tag":"Bagel Specialist","why":"เบเกิลทำสด เหมาะมื้อเช้าเร็ว","menu":"Smoked Salmon Bagel","budget":"180–420","bmin":180,"bmax":420,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7930966,98.9930928&query_place_id=ChIJ_1N_Bp862jARz2DndCjMTno","lat":18.7930966,"lng":98.9930928,"approx":false,"hours_disp":"ทุกวัน 08:15–17:00","sched":[[[495,1020]],[[495,1020]],[[495,1020]],[[495,1020]],[[495,1020]],[[495,1020]],[[495,1020]]],"phone":"+66 91 632 3688","reserve":false},{"id":30,"cat":"Breakfast & Brunch","name":"Groon Bread & Brunch","zone":"ศิริมังคลาจารย์","area":"นิมมาน / สันติธรรม","tier":"A","tag":"Bread + Brunch","why":"ขนมปังและจาน brunch ทำได้ดี","menu":"Shokupan, Croissant, Brunch Plate","budget":"180–500","bmin":180,"bmax":500,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7951686,98.9710687&query_place_id=ChIJ_x1au2I72jARdYslFFmvtjQ","lat":18.7951686,"lng":98.9710687,"approx":false,"hours_disp":"ทุกวัน 08:30–17:00","sched":[[[510,1020]],[[510,1020]],[[510,1020]],[[510,1020]],[[510,1020]],[[510,1020]],[[510,1020]]],"phone":"+66 61 582 4490","reserve":false},{"id":31,"cat":"Breakfast & Brunch","name":"Sunday Baker","zone":"ตัวเมือง","area":"เมืองเก่า / ท่าแพ","tier":"A","tag":"Bakery Brunch","why":"ขนมอบและอาหารเช้าคุณภาพดี","menu":"Croissant, Breakfast Set","budget":"180–450","bmin":180,"bmax":450,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7815674,98.9854665&query_place_id=ChIJzV4zMG072jARZO-8n_Sf3eA","lat":18.7815674,"lng":98.9854665,"approx":false,"hours_disp":"ปิดวันพ · พฤ-อ 07:30–17:00","sched":[[[450,1020]],[[450,1020]],null,[[450,1020]],[[450,1020]],[[450,1020]],[[450,1020]]],"phone":"+66 83 161 6735","reserve":false},{"id":32,"cat":"อาหารเหนือ","name":"ฮ้านถึงเจียงใหม่","zone":"สุเทพ","area":"มช. / สุเทพ","tier":"S+","tag":"Local Favorite","why":"รสพื้นเมืองเข้มและเมนูหลากหลาย","menu":"แกงฮังเล, จิ้นส้มหมกไข่, ลาบคั่ว","budget":"150–400","bmin":150,"bmax":400,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี","map":"https://www.google.com/maps/search/?api=1&query=18.788962,98.9547512&query_place_id=ChIJo-HFUHA62jAR5dGbBg8M-j4","lat":18.788962,"lng":98.9547512,"approx":false,"hours_disp":"ทุกวัน 10:00–16:00 และ 17:00–21:30","sched":[[[600,960],[1020,1290]],[[600,960],[1020,1290]],[[600,960],[1020,1290]],[[600,960],[1020,1290]],[[600,960],[1020,1290]],[[600,960],[1020,1290]],[[600,960],[1020,1290]]],"phone":"+66 93 970 6885","reserve":false},{"id":33,"cat":"อาหารเหนือ","name":"เฮือนม่วนใจ๋","zone":"ช้างเผือก","area":"เหนือเมือง / แม่ริม","tier":"S+","tag":"Michelin / Local","why":"อาหารเหนือรสแท้ คุณภาพสม่ำเสมอ","menu":"ออร์เดิร์ฟเมือง, แกงฮังเล","budget":"200–550","bmin":200,"bmax":550,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มีแต่เต็มเร็ว","map":"https://www.google.com/maps/search/?api=1&query=18.7998592,98.9756064&query_place_id=ChIJ7ZMzGIw62jARMdc3g4pLrWs","lat":18.7998592,"lng":98.9756064,"approx":false,"hours_disp":"ปิดวันพ · พฤ-อ 11:00–21:00","sched":[[[660,1260]],[[660,1260]],null,[[660,1260]],[[660,1260]],[[660,1260]],[[660,1260]]],"phone":"+66 98 261 8029","reserve":false},{"id":34,"cat":"อาหารเหนือ","name":"ข้าวซอยแม่มณี","zone":"ช้างเผือก","area":"เหนือเมือง / แม่ริม","tier":"S+","tag":"Khao Soi Legend","why":"ข้าวซอยสูตรเก่าแก่ เครื่องแกงชัด","menu":"ข้าวซอยเนื้อ, ไก่","budget":"60–150","bmin":60,"bmax":150,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.8361796,98.9776553&query_place_id=ChIJGWg4YAQ72jARKzeMwx43KUA","lat":18.8361796,"lng":98.9776553,"approx":false,"hours_disp":"ทุกวัน 09:00–15:30","sched":[[[540,930]],[[540,930]],[[540,930]],[[540,930]],[[540,930]],[[540,930]],[[540,930]]],"phone":"+66 81 961 2235","reserve":false},{"id":35,"cat":"อาหารเหนือ","name":"ข้าวซอยแม่สาย","zone":"ช้างเผือก","area":"เหนือเมือง / แม่ริม","tier":"S+","tag":"Michelin Favorite","why":"ข้าวซอยและน้ำเงี้ยวราคาดี","menu":"ข้าวซอยเนื้อ, น้ำเงี้ยว","budget":"50–130","bmin":50,"bmax":130,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7995989,98.9752135&query_place_id=ChIJqcysHow62jAR6ElsdYpG8EU","lat":18.7995989,"lng":98.9752135,"approx":false,"hours_disp":"จ-ส 08:00–16:00 · ปิดวันอา","sched":[[[480,960]],[[480,960]],[[480,960]],[[480,960]],[[480,960]],[[480,960]],null],"phone":"+66 53 213 284","reserve":false},{"id":36,"cat":"อาหารเหนือ","name":"กิติพานิช","zone":"ช้างม่อย","area":"เมืองเก่า / ท่าแพ","tier":"S+","tag":"Premium Lanna","why":"อาหารล้านนาประณีตในอาคารประวัติศาสตร์","menu":"แกงฮังเล, ลาบคั่ว","budget":"600–1,600","bmin":600,"bmax":1600,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7879676,99.0004668&query_place_id=ChIJdd0G__w72jARbHS_755Yc4Q","lat":18.7879676,"lng":99.0004668,"approx":false,"hours_disp":"ปิดวันอ · พ-จ 11:30–15:00 และ 17:00–22:00","sched":[[[690,900],[1020,1320]],null,[[690,900],[1020,1320]],[[690,900],[1020,1320]],[[690,900],[1020,1320]],[[690,900],[1020,1320]],[[690,900],[1020,1320]]],"phone":"+66 80 191 7996","reserve":true},{"id":37,"cat":"อาหารเหนือ","name":"ข้าวซอยลำดวนฟ้าฮ่าม","zone":"ฟ้าฮ่าม","area":"ริมปิง / วัดเกต","tier":"S","tag":"Classic","why":"ร้านเก่าแก่ที่เป็นภาพจำข้าวซอยเชียงใหม่","menu":"ข้าวซอย, หมูสะเต๊ะ","budget":"80–220","bmin":80,"bmax":220,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี","map":"https://www.google.com/maps/search/?api=1&query=18.8016062,99.0054128&query_place_id=ChIJlfFg_7Y62jAREv2CE0B_7A8","lat":18.8016062,"lng":99.0054128,"approx":false,"hours_disp":"ทุกวัน 08:30–15:30","sched":[[[510,930]],[[510,930]],[[510,930]],[[510,930]],[[510,930]],[[510,930]],[[510,930]]],"phone":"+66 93 135 7930","reserve":false},{"id":38,"cat":"อาหารเหนือ","name":"เฮือนเพ็ญ","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"S","tag":"Classic Northern","why":"รวมเมนูเหนือจำนวนมาก","menu":"แกงฮังเล, น้ำพริกหนุ่ม, ไส้อั่ว","budget":"150–500","bmin":150,"bmax":500,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7858228,98.9851475&query_place_id=ChIJQ8w_oZ462jARl7wCt952UVI","lat":18.7858228,"lng":98.9851475,"approx":false,"hours_disp":"ทุกวัน 08:30–16:30 และ 17:00–22:00","sched":[[[510,990],[1020,1320]],[[510,990],[1020,1320]],[[510,990],[1020,1320]],[[510,990],[1020,1320]],[[510,990],[1020,1320]],[[510,990],[1020,1320]],[[510,990],[1020,1320]]],"phone":"+66 86 911 2882","reserve":false},{"id":39,"cat":"อาหารเหนือ","name":"ต๋องเต็มโต๊ะ","zone":"นิมมาน","area":"นิมมาน / สันติธรรม","tier":"A+","tag":"Popular Northern","why":"รสคงที่และสั่งง่าย","menu":"ออร์เดิร์ฟเมือง, ผักเชียงดาผัดไข่","budget":"150–450","bmin":150,"bmax":450,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จอดยาก","map":"https://www.google.com/maps/search/?api=1&query=18.7966507,98.9677373&query_place_id=ChIJCfx-imI62jAROS3ac08yq_U","lat":18.7966507,"lng":98.9677373,"approx":false,"hours_disp":"ทุกวัน 08:00–23:00","sched":[[[480,1380]],[[480,1380]],[[480,1380]],[[480,1380]],[[480,1380]],[[480,1380]],[[480,1380]]],"reserve":false},{"id":40,"cat":"อาหารเหนือ","name":"CHAWEE","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A+","tag":"Michelin Selected","why":"อาหารเหนือร่วมสมัยและวัตถุดิบดี","menu":"เมนูตามฤดูกาล","budget":"400–1,000","bmin":400,"bmax":1000,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"สอบถามร้าน","map":"https://www.google.com/maps/search/?api=1&query=18.8258178,98.9794657&query_place_id=ChIJ5xhopbs72jAR0YEkZL7FvWA","lat":18.8258178,"lng":98.9794657,"approx":false,"hours_disp":"ปิดวันอ · พ-จ 11:00–15:00 และ 17:00–21:00","sched":[[[660,900],[1020,1260]],null,[[660,900],[1020,1260]],[[660,900],[1020,1260]],[[660,900],[1020,1260]],[[660,900],[1020,1260]],[[660,900],[1020,1260]]],"phone":"+66 84 324 9363","reserve":true},{"id":41,"cat":"อาหารเหนือ","name":"Magnolia Café","zone":"ตัวเมือง","area":"เมืองเก่า / ท่าแพ","tier":"A+","tag":"Michelin Hidden Gem","why":"อาหารไทยเหนือรสละเอียด","menu":"เมนูเหนือประจำวัน","budget":"250–700","bmin":250,"bmax":700,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.8005194,98.9970933&query_place_id=ChIJGaxEJLk62jAR0qLCpNDcjzk","lat":18.8005194,"lng":98.9970933,"approx":false,"hours_disp":"จ-ส 17:00–22:00 · ปิดวันอา","sched":[[[1020,1320]],[[1020,1320]],[[1020,1320]],[[1020,1320]],[[1020,1320]],[[1020,1320]],null],"phone":"+66 61 684 8222","reserve":true},{"id":42,"cat":"อาหารเหนือ","name":"Lung Khajohn Wat Ket","zone":"วัดเกต","area":"ริมปิง / วัดเกต","tier":"A+","tag":"Michelin Local","why":"ความเป็น local ชัดและรสชาติจริงจัง","menu":"อาหารเหนือ/ไทยประจำวัน","budget":"150–450","bmin":150,"bmax":450,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7923031,99.0021954&query_place_id=ChIJMb2sBrA62jAREBOddQOc-Mc","lat":18.7923031,"lng":99.0021954,"approx":false,"hours_disp":"จ-ส 06:00–14:30 · ปิดวันอา","sched":[[[360,870]],[[360,870]],[[360,870]],[[360,870]],[[360,870]],[[360,870]],null],"phone":"+66 86 917 9887","reserve":false},{"id":43,"cat":"อาหารเหนือ","name":"ลำดีตี้ขัวแดง","zone":"สันทราย","area":"เหนือเมือง / แม่ริม","tier":"A","tag":"Family Local","why":"เมนูเหนือครบ เหมาะกลุ่มใหญ่","menu":"แกงแค, ลาบคั่ว","budget":"200–500","bmin":200,"bmax":500,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"กว้าง","map":"https://www.google.com/maps/search/?api=1&query=18.7984565,99.0331509&query_place_id=ChIJt3COukEl2jARwV0QmMMqjpM","lat":18.7984565,"lng":99.0331509,"approx":false,"hours_disp":"ทุกวัน 10:30–21:00","sched":[[[630,1260]],[[630,1260]],[[630,1260]],[[630,1260]],[[630,1260]],[[630,1260]],[[630,1260]]],"phone":"+66 86 688 3688","reserve":false},{"id":44,"cat":"อาหารเหนือ","name":"Ginger Farm Kitchen","zone":"นิมมาน","area":"นิมมาน / สันติธรรม","tier":"A","tag":"Accessible Northern","why":"วัตถุดิบดีและรสเข้าถึงง่าย","menu":"ข้าวซอย, แกงฮังเล","budget":"250–700","bmin":250,"bmax":700,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"One Nimman","map":"https://www.google.com/maps/search/?api=1&query=18.7998448,98.9675472&query_place_id=ChIJI7OL9GE62jARTIo-coWTeBw","lat":18.7998448,"lng":98.9675472,"approx":false,"hours_disp":"ทุกวัน 11:00–23:00","sched":[[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]]],"phone":"+66 52 080 927","reserve":false},{"id":45,"cat":"อาหารเหนือ","name":"เฮือนสุนทรี","zone":"ริมปิง","area":"ริมปิง / วัดเกต","tier":"A","tag":"Dinner + Music","why":"อาหารเหนือพร้อมดนตรีสด","menu":"ออร์เดิร์ฟเมือง, ไส้อั่ว","budget":"250–650","bmin":250,"bmax":650,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี/จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.830827,98.9943923&query_place_id=ChIJbV6xHCE72jARoswg5su4Ock","lat":18.830827,"lng":98.9943923,"approx":false,"hours_disp":"จ-ส 16:30–23:00 · ปิดวันอา","sched":[[[990,1380]],[[990,1380]],[[990,1380]],[[990,1380]],[[990,1380]],[[990,1380]],null],"phone":"+66 83 860 8196","reserve":false},{"id":46,"cat":"อาหารเหนือ","name":"น้ำเงี้ยวลุงพงษ์","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"Local Noodle","why":"ร้าน local ที่ถูกแนะนำโดยคนเชียงใหม่","menu":"ขนมจีนน้ำเงี้ยว","budget":"50–120","bmin":50,"bmax":120,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7866331,98.9849508&query_place_id=ChIJ56EKBJw62jARwiBtEbyVS7Y","lat":18.7866331,"lng":98.9849508,"approx":false,"hours_disp":"ปิดวันพฤ · ศ-พ 09:30–15:00","sched":[[[570,900]],[[570,900]],[[570,900]],null,[[570,900]],[[570,900]],[[570,900]]],"phone":"+66 53 814 962","reserve":false},{"id":47,"cat":"อาหารเหนือ","name":"คุ้มเวียงยอง","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"Home-style Local","why":"อาหารพื้นบ้านตามฤดูกาล","menu":"คั่วเห็ดถอบ, เมนูเหนือ","budget":"150–400","bmin":150,"bmax":400,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ตรวจสอบ Maps","map":"https://www.google.com/maps/search/?api=1&query=18.7711139,98.9499084&query_place_id=ChIJ9ykSY5cw2jARAA6r1bp3yqM","lat":18.7711139,"lng":98.9499084,"approx":false,"sched":null,"reserve":false},{"id":48,"cat":"Thai & Fine Dining","name":"Baan Landai Fine Thai Cuisine","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"S+","tag":"Michelin Thai","why":"อาหารไทยรสละเอียดและคัดวัตถุดิบดี","menu":"แกงปูใบชะพลู, หมูฮ้อง","budget":"450–1,100","bmin":450,"bmax":1100,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7940281,98.9874588&query_place_id=ChIJn9ce4sk72jARiF6Gtvq0DV4","lat":18.7940281,"lng":98.9874588,"approx":false,"hours_disp":"ปิดวันจ · อ-อา 11:00–14:30 และ 17:00–20:30","sched":[null,[[660,870],[1020,1230]],[[660,870],[1020,1230]],[[660,870],[1020,1230]],[[660,870],[1020,1230]],[[660,870],[1020,1230]],[[660,870],[1020,1230]]],"phone":"+66 65 848 4464","reserve":true},{"id":49,"cat":"Thai & Fine Dining","name":"Blackitch Artisan Kitchen","zone":"แม่เหียะ","area":"ใต้เมือง / หางดง","tier":"S+","tag":"Chef's Table","why":"ตีความวัตถุดิบท้องถิ่นผ่าน tasting menu","menu":"Seasonal Tasting Menu","budget":"2,500–4,800","bmin":2500,"bmax":4800,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7981264,98.969557&query_place_id=ChIJU9Y16Ik62jARJnrozimcTLc","lat":18.7981264,"lng":98.969557,"approx":false,"hours_disp":"ปิดวันอ-พฤ · ศ-จ 11:30–14:00 และ 17:00–22:00","sched":[[[690,840],[1020,1320]],null,null,null,[[690,840],[1020,1320]],[[690,840],[1020,1320]],[[690,840],[1020,1320]]],"phone":"+66 83 641 9246","reserve":true},{"id":50,"cat":"Thai & Fine Dining","name":"Cuisine de Garden","zone":"หางดง","area":"ใต้เมือง / หางดง","tier":"S+","tag":"Fine Dining","why":"วัตถุดิบไทยกับเทคนิคยุโรป","menu":"Seasonal Tasting Menu","budget":"2,000–4,500","bmin":2000,"bmax":4500,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี","map":"https://www.google.com/maps/search/?api=1&query=18.7170731,98.935934&query_place_id=ChIJVaBqRT8x2jARIx3YQwVPjIs","lat":18.7170731,"lng":98.935934,"approx":false,"hours_disp":"ทุกวัน 12:30–14:30 และ 18:00–22:00","sched":[[[750,870],[1080,1320]],[[750,870],[1080,1320]],[[750,870],[1080,1320]],[[750,870],[1080,1320]],[[750,870],[1080,1320]],[[750,870],[1080,1320]],[[750,870],[1080,1320]]],"phone":"+66 65 661 5646","reserve":true},{"id":51,"cat":"Thai & Fine Dining","name":"The House by Ginger","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"S+","tag":"Premium Thai","why":"อาหารไทยคุณภาพสูงและบริการดี","menu":"แกงปู, หมูกรอบ, ยำ","budget":"700–1,900","bmin":700,"bmax":1900,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7927884,98.9932209&query_place_id=ChIJNVnFK7062jARHAtoL1m4ZYk","lat":18.7927884,"lng":98.9932209,"approx":false,"hours_disp":"ทุกวัน 11:00–23:00","sched":[[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]]],"phone":"+66 53 287 681","reserve":false},{"id":52,"cat":"Thai & Fine Dining","name":"Maadae Slow Fish Kitchen","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"S+","tag":"Top Tables 2026","why":"ร้านเด่นด้านปลาและวัตถุดิบท้องถิ่น","menu":"เมนูปลาและซีฟู้ดตามฤดูกาล","budget":"1,000–2,500","bmin":1000,"bmax":2500,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ตรวจสอบ Maps","map":"https://www.google.com/maps/search/?api=1&query=18.7880395,99.000896&query_place_id=ChIJ9Z8ds-g72jARZQ390uYvNME","lat":18.7880395,"lng":99.000896,"approx":false,"hours_disp":"ปิดวันพ · พฤ-อ 11:00–22:00","sched":[[[660,1320]],[[660,1320]],null,[[660,1320]],[[660,1320]],[[660,1320]],[[660,1320]]],"phone":"+66 92 669 0514","reserve":true},{"id":53,"cat":"Thai & Fine Dining","name":"Belén by Paulo Airaudo","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"S+","tag":"Top Tables 2026","why":"ไฟน์ไดนิ่งร่วมสมัยระดับ destination","menu":"Tasting Menu","budget":"3,000–6,000","bmin":3000,"bmax":6000,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"โรงแรม/ร้าน","map":"https://www.google.com/maps/search/?api=1&query=18.7827323,98.9977927&query_place_id=ChIJRZSGLgA72jARfnKhBDyVlcM","lat":18.7827323,"lng":98.9977927,"approx":false,"hours_disp":"ปิดวันพ · พฤ-อ 17:30–23:00","sched":[[[1050,1380]],[[1050,1380]],null,[[1050,1380]],[[1050,1380]],[[1050,1380]],[[1050,1380]]],"phone":"+66 96 254 7899","reserve":true},{"id":54,"cat":"Thai & Fine Dining","name":"Redbox","zone":"ตัวเมือง","area":"เมืองเก่า / ท่าแพ","tier":"S","tag":"Creative Thai","why":"อาหารไทยร่วมสมัยและการจัดจานสร้างสรรค์","menu":"Chef's Menu","budget":"1,500–3,800","bmin":1500,"bmax":3800,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"สอบถามร้าน","map":"https://www.google.com/maps/search/?api=1&query=18.8016768,98.9699508&query_place_id=ChIJ0-sob4o62jARKSy6Vyu4QbQ","lat":18.8016768,"lng":98.9699508,"approx":false,"hours_disp":"ปิดวันอ · พ-จ 11:30–14:00 และ 17:30–22:00","sched":[[[690,840],[1050,1320]],null,[[690,840],[1050,1320]],[[690,840],[1050,1320]],[[690,840],[1050,1320]],[[690,840],[1050,1320]],[[690,840],[1050,1320]]],"phone":"+66 92 979 4542","reserve":true},{"id":55,"cat":"Thai & Fine Dining","name":"Puang Thong Restaurant","zone":"ริมปิง","area":"ริมปิง / วัดเกต","tier":"S","tag":"Foodie Favorite","why":"อาหารไทยรสจัดสมดุลและซีฟู้ดเด่น","menu":"กุ้งแม่น้ำ, ยำ","budget":"350–950","bmin":350,"bmax":950,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7618638,98.9998785&query_place_id=ChIJB_jrOhcw2jARGy7qzvyyU70","lat":18.7618638,"lng":98.9998785,"approx":false,"hours_disp":"จ-ส 17:00–22:00 · ปิดวันอา","sched":[[[1020,1320]],[[1020,1320]],[[1020,1320]],[[1020,1320]],[[1020,1320]],[[1020,1320]],null],"phone":"+66 81 594 0541","reserve":false},{"id":56,"cat":"Thai & Fine Dining","name":"Thaan Aoan","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"A+","tag":"Michelin Local Thai","why":"อาหารไทยจริงจังแต่เข้าถึงง่าย","menu":"เมนูไทยประจำวัน","budget":"250–750","bmin":250,"bmax":750,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7855709,98.9884105&query_place_id=ChIJ6yBbIp862jAR7qYMN888EzA","lat":18.7855709,"lng":98.9884105,"approx":false,"hours_disp":"ทุกวัน 07:00–21:00","sched":[[[420,1260]],[[420,1260]],[[420,1260]],[[420,1260]],[[420,1260]],[[420,1260]],[[420,1260]]],"phone":"+66 92 613 0320","reserve":false},{"id":57,"cat":"Thai & Fine Dining","name":"Garden to Table Chiangmai","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A+","tag":"Farm-to-table","why":"วัตถุดิบสดและเมนูตามฤดูกาล","menu":"เมนูผัก, พาสต้า","budget":"300–850","bmin":300,"bmax":850,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี/จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7865086,98.990431&query_place_id=ChIJT2UZ_Hw72jARiJRwNfxTJVU","lat":18.7865086,"lng":98.990431,"approx":false,"hours_disp":"จ-พ 14:00–21:00 · พฤ 14:00–20:30 · ศ 14:00–21:00 · ส 14:00–20:30 · ปิดวันอา","sched":[[[840,1260]],[[840,1260]],[[840,1260]],[[840,1230]],[[840,1260]],[[840,1230]],null],"phone":"+66 82 583 6999","reserve":false},{"id":58,"cat":"Thai & Fine Dining","name":"Oxygen Dining Room","zone":"ริมปิง","area":"ริมปิง / วัดเกต","tier":"A+","tag":"Romantic Fine Dining","why":"ไฟน์ไดนิ่งริมแม่น้ำ","menu":"Tasting Menu","budget":"2,000–4,800","bmin":2000,"bmax":4800,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"โรงแรม","map":"https://www.google.com/maps/search/?api=1&query=18.801762,99.0045846&query_place_id=ChIJKylKs7c62jARu7DZZOxmg9I","lat":18.801762,"lng":99.0045846,"approx":false,"hours_disp":"ทุกวัน 11:30–22:00","sched":[[[690,1320]],[[690,1320]],[[690,1320]],[[690,1320]],[[690,1320]],[[690,1320]],[[690,1320]]],"phone":"+66 53 931 999","reserve":true},{"id":59,"cat":"Thai & Fine Dining","name":"Service 1921","zone":"ไนท์บาซาร์","area":"ช้างคลาน / ไนท์บาซาร์","tier":"A","tag":"Hotel Dining","why":"อาหารจีนยูนนานและเอเชียในอาคารประวัติศาสตร์","menu":"ติ่มซำ, เป็ด","budget":"900–2,300","bmin":900,"bmax":2300,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"โรงแรม","map":"https://www.google.com/maps/search/?api=1&query=18.7815271,99.0042074&query_place_id=ChIJebnFrAgw2jARocTTZFWWvWo","lat":18.7815271,"lng":99.0042074,"approx":false,"hours_disp":"ทุกวัน 12:00–22:30","sched":[[[720,1350]],[[720,1350]],[[720,1350]],[[720,1350]],[[720,1350]],[[720,1350]],[[720,1350]]],"phone":"+66 53 253 333","reserve":true},{"id":60,"cat":"Thai & Fine Dining","name":"Friend's Table","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A+","tag":"Top Tables 2026","why":"เชฟเทเบิลขนาดเล็กและมีคาแรกเตอร์","menu":"Tasting Menu","budget":"2,000–4,000","bmin":2000,"bmax":4000,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ตรวจสอบ Maps","map":"https://www.google.com/maps/search/?api=1&query=18.7034091,98.9091854&query_place_id=ChIJc482iJo32jAR-pW1h1xjER0","lat":18.7034091,"lng":98.9091854,"approx":false,"hours_disp":"ปิดวันจ · อ-อา 18:30–22:30","sched":[null,[[1110,1350]],[[1110,1350]],[[1110,1350]],[[1110,1350]],[[1110,1350]],[[1110,1350]]],"phone":"+66 90 321 3344","reserve":true},{"id":61,"cat":"Thai & Fine Dining","name":"Parc","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A+","tag":"Top Tables 2026","why":"ร้านร่วมสมัยที่ได้รับการคัดในปี 2026","menu":"Seasonal Menu","budget":"1,000–2,500","bmin":1000,"bmax":2500,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ตรวจสอบ Maps","map":"https://www.google.com/maps/search/?api=1&query=18.7688031,98.9810305&query_place_id=ChIJU40ogdYx2jARaZ9Ksf85R0I","lat":18.7688031,"lng":98.9810305,"approx":false,"hours_disp":"ทุกวัน 11:00–23:00","sched":[[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]]],"phone":"+66 62 309 8222","reserve":false},{"id":62,"cat":"International","name":"Adirak Pizza","zone":"สุเทพ","area":"มช. / สุเทพ","tier":"S","tag":"Local Pizza Favorite","why":"พิซซ่าแป้งดี หน้าเรียบง่ายแต่รสชัด","menu":"Wood-fired Pizza","budget":"250–700","bmin":250,"bmax":700,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7750916,98.9475747&query_place_id=ChIJd-9OkZgw2jARgR9bYCtkpDE","lat":18.7750916,"lng":98.9475747,"approx":false,"hours_disp":"ทุกวัน 11:00–22:30","sched":[[[660,1350]],[[660,1350]],[[660,1350]],[[660,1350]],[[660,1350]],[[660,1350]],[[660,1350]]],"phone":"+66 81 916 9614","reserve":false},{"id":63,"cat":"International","name":"Why Not? Italian Restaurant","zone":"นิมมาน","area":"นิมมาน / สันติธรรม","tier":"A+","tag":"Italian Classic","why":"ร้านอิตาเลียนเก่าแก่ที่คนเชียงใหม่กลับไปซ้ำ","menu":"Pizza, Pasta, Lasagna","budget":"350–950","bmin":350,"bmax":950,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7966035,98.9679494&query_place_id=ChIJZQIuYWI62jARljfhqEo0xHU","lat":18.7966035,"lng":98.9679494,"approx":false,"hours_disp":"จ 16:00–23:00 · อ-อา 12:00–23:00","sched":[[[960,1380]],[[720,1380]],[[720,1380]],[[720,1380]],[[720,1380]],[[720,1380]],[[720,1380]]],"phone":"+66 53 289 262","reserve":false},{"id":64,"cat":"International","name":"Dinky's BBQ","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"S","tag":"BBQ Specialist","why":"เนื้อรมควันจริงจัง","menu":"Brisket, Pork Ribs","budget":"450–1,300","bmin":450,"bmax":1300,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"สอบถามร้าน","map":"https://www.google.com/maps/search/?api=1&query=18.778325,98.9500546&query_place_id=ChIJlZy0I2072jAR1F-Wiqe2ZfU","lat":18.778325,"lng":98.9500546,"approx":false,"hours_disp":"ทุกวัน 11:00–21:00","sched":[[[660,1260]],[[660,1260]],[[660,1260]],[[660,1260]],[[660,1260]],[[660,1260]],[[660,1260]]],"phone":"+66 82 898 5085","reserve":false},{"id":65,"cat":"International","name":"Hummus Chiang Mai","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"A+","tag":"Middle Eastern Favorite","why":"ร้านเล็ก รสชาติดีและคุ้ม","menu":"Hummus, Falafel, Shakshuka","budget":"180–500","bmin":180,"bmax":500,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7749381,98.9994335&query_place_id=ChIJaRjpEbs72jARUhw5hedocOI","lat":18.7749381,"lng":98.9994335,"approx":false,"hours_disp":"ทุกวัน 10:00–22:30","sched":[[[600,1350]],[[600,1350]],[[600,1350]],[[600,1350]],[[600,1350]],[[600,1350]],[[600,1350]]],"phone":"+66 99 298 5222","reserve":false},{"id":66,"cat":"International","name":"Uchi Japanese Gastrobar","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A+","tag":"Japanese Gastrobar","why":"ซูชิและเมนูญี่ปุ่นร่วมสมัย","menu":"Sushi, Signature Cocktails","budget":"700–1,800","bmin":700,"bmax":1800,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ตรวจสอบ Maps","map":"https://www.google.com/maps/search/?api=1&query=18.7978365,98.9646663&query_place_id=ChIJ8Xz-yA072jARxnB_e8JdRNk","lat":18.7978365,"lng":98.9646663,"approx":false,"hours_disp":"ทุกวัน 11:00–24:00","sched":[[[660,1440]],[[660,1440]],[[660,1440]],[[660,1440]],[[660,1440]],[[660,1440]],[[660,1440]]],"phone":"+66 64 896 6196","reserve":false},{"id":67,"cat":"International","name":"Musashi Sushi","zone":"นิมมาน","area":"นิมมาน / สันติธรรม","tier":"A","tag":"Popular Japanese","why":"ซูชิคุณภาพดี ราคาไม่แรงเกินไป","menu":"Sushi, Sashimi","budget":"350–1,000","bmin":350,"bmax":1000,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7894132,98.9879468&query_place_id=ChIJ8WC1iWI62jARd5OKmmBRBcw","lat":18.7894132,"lng":98.9879468,"approx":false,"hours_disp":"ทุกวัน 11:30–21:30","sched":[[[690,1290]],[[690,1290]],[[690,1290]],[[690,1290]],[[690,1290]],[[690,1290]],[[690,1290]]],"phone":"+66 82 344 6635","reserve":false},{"id":68,"cat":"International","name":"Shishitei Chiangmai","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"Japanese Dining","why":"ร้านญี่ปุ่นที่รีวิวสูง","menu":"Sashimi, Donburi","budget":"400–1,200","bmin":400,"bmax":1200,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ตรวจสอบ Maps","map":"https://www.google.com/maps/search/?api=1&query=18.7975449,98.969291&query_place_id=ChIJX-3PSLw72jAR7wD6lem0Dzk","lat":18.7975449,"lng":98.969291,"approx":false,"hours_disp":"จ-ศ 11:30–14:00 และ 17:00–21:30 · ส·อา 11:30–21:30","sched":[[[690,840],[1020,1290]],[[690,840],[1020,1290]],[[690,840],[1020,1290]],[[690,840],[1020,1290]],[[690,840],[1020,1290]],[[690,1290]],[[690,1290]]],"phone":"+66 53 215 129","reserve":false},{"id":69,"cat":"International","name":"Sushi Umai","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"Japanese Favorite","why":"วัตถุดิบดีและความคุ้มค่า","menu":"Sushi, Sashimi, Donburi","budget":"400–1,300","bmin":400,"bmax":1300,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี/จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7960041,98.9682556&query_place_id=ChIJ3-m3AWM62jARegrIS5UXj-k","lat":18.7960041,"lng":98.9682556,"approx":false,"hours_disp":"จ-ศ 11:00–14:00 และ 17:00–21:30 · ส·อา 11:00–21:30","sched":[[[660,840],[1020,1290]],[[660,840],[1020,1290]],[[660,840],[1020,1290]],[[660,840],[1020,1290]],[[660,840],[1020,1290]],[[660,1290]],[[660,1290]]],"phone":"+66 53 213 104","reserve":false},{"id":70,"cat":"International","name":"Gohanya","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"Japanese Local","why":"อาหารญี่ปุ่นแบบเรียบง่าย รสสม่ำเสมอ","menu":"Set Meal, Curry","budget":"200–600","bmin":200,"bmax":600,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7926444,98.9928098&query_place_id=ChIJQ3kPLb062jAR-VxF7crV7pc","lat":18.7926444,"lng":98.9928098,"approx":false,"hours_disp":"ทุกวัน 11:00–21:00","sched":[[[660,1260]],[[660,1260]],[[660,1260]],[[660,1260]],[[660,1260]],[[660,1260]],[[660,1260]]],"phone":"+66 83 945 4518","reserve":false},{"id":71,"cat":"International","name":"Mare Seafood","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"Italian Seafood","why":"อาหารทะเลและพาสต้าได้รับรีวิวสูง","menu":"Crab Pasta, Seafood","budget":"500–1,300","bmin":500,"bmax":1300,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ตรวจสอบ Maps","map":"https://www.google.com/maps/search/?api=1&query=18.7834901,99.0057291&query_place_id=ChIJG9MVPL472jAR94h7iVr_9TI","lat":18.7834901,"lng":99.0057291,"approx":false,"hours_disp":"ทุกวัน 11:00–24:00","sched":[[[660,1440]],[[660,1440]],[[660,1440]],[[660,1440]],[[660,1440]],[[660,1440]],[[660,1440]]],"phone":"+66 63 798 5555","reserve":true},{"id":72,"cat":"International","name":"Street Pizza & The Wine House","zone":"ท่าแพ","area":"เมืองเก่า / ท่าแพ","tier":"A","tag":"Pizza + Wine","why":"พิซซ่าและไวน์ในบรรยากาศสบาย","menu":"Pizza, Pasta","budget":"350–900","bmin":350,"bmax":900,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7876922,99.0007389&query_place_id=ChIJPbq-k6U62jARgsi9tAXSHwI","lat":18.7876922,"lng":99.0007389,"approx":false,"sched":null,"phone":"+66 63 119 2695","reserve":false},{"id":73,"cat":"International","name":"David's Kitchen at 909","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"Special Occasion","why":"ร้านยุโรปบริการดี เหมาะโอกาสพิเศษ","menu":"Steak, European Mains","budget":"1,200–3,000","bmin":1200,"bmax":3000,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี","map":"https://www.google.com/maps/search/?api=1&query=18.7963606,99.0082041&query_place_id=ChIJJ4MeCW072jARTMW_4GZawt4","lat":18.7963606,"lng":99.0082041,"approx":false,"sched":null,"phone":"+66 91 068 1744","reserve":true},{"id":74,"cat":"Bakery & Dessert","name":"Nana Jungle","zone":"ช้างเคี่ยน","area":"เหนือเมือง / แม่ริม","tier":"S+","tag":"Saturday Legend","why":"ตลาดขนมปังวันเสาร์ระดับตำนาน","menu":"Croissant, Baguette, Sourdough","budget":"80–380","bmin":80,"bmax":380,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มีแต่รถเยอะ","map":"https://www.google.com/maps/search/?api=1&query=18.7528652,99.0085509&query_place_id=ChIJqWm6rpwx2jARhUevz-QCS9g","lat":18.7528652,"lng":99.0085509,"approx":false,"sched":null,"phone":"+66 95 861 2920","reserve":false},{"id":75,"cat":"Bakery & Dessert","name":"Forest Bake","zone":"วัดเกต","area":"ริมปิง / วัดเกต","tier":"S+","tag":"Artisan Bakery","why":"ขนมโฮมเมดมีเอกลักษณ์","menu":"Cinnamon Roll, Carrot Cake","budget":"120–420","bmin":120,"bmax":420,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7922498,99.0048625&query_place_id=ChIJ35MC27E62jARhFKsJ0G99SU","lat":18.7922498,"lng":99.0048625,"approx":false,"hours_disp":"จ·อ 09:00–17:00 · ปิดวันพ · พฤ 09:00–17:00 · ศ-อา 08:30–17:00","sched":[[[540,1020]],[[540,1020]],null,[[540,1020]],[[510,1020]],[[510,1020]],[[510,1020]]],"phone":"+66 91 928 8436","reserve":false},{"id":76,"cat":"Bakery & Dessert","name":"Flour Flour","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"S+","tag":"Sourdough Specialist","why":"ขนมปังหมักธรรมชาติและ toast แข็งแรง","menu":"Sourdough, Toast","budget":"120–420","bmin":120,"bmax":420,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7935398,98.9492306&query_place_id=ChIJQbZ-Cyo72jAR_wlCzoonJbA","lat":18.7935398,"lng":98.9492306,"approx":false,"hours_disp":"ทุกวัน 07:30–15:00","sched":[[[450,900]],[[450,900]],[[450,900]],[[450,900]],[[450,900]],[[450,900]],[[450,900]]],"phone":"+66 92 916 4166","reserve":false},{"id":77,"cat":"Bakery & Dessert","name":"Saruda Finest Pastry","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"S+","tag":"Pastry Artist","why":"เพสตรี้ประณีตทั้งหน้าตาและรส","menu":"Entremet, Tart","budget":"180–550","bmin":180,"bmax":550,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี/จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.8024042,98.9674441&query_place_id=ChIJPyN2FNA72jARhBa6Zct6-tg","lat":18.8024042,"lng":98.9674441,"approx":false,"hours_disp":"ทุกวัน 10:00–22:00","sched":[[[600,1320]],[[600,1320]],[[600,1320]],[[600,1320]],[[600,1320]],[[600,1320]],[[600,1320]]],"phone":"+66 63 867 0868","reserve":false},{"id":78,"cat":"Bakery & Dessert","name":"Chez Nous","zone":"สันกำแพง","area":"สันกำแพง","tier":"S+","tag":"French Pastry","why":"ครัวซองต์ชั้นแป้งสวยและเนยชัด","menu":"Butter Croissant, Kouign-amann","budget":"100–400","bmin":100,"bmax":400,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี","map":"https://www.google.com/maps/search/?api=1&query=18.7751286,99.0600491&query_place_id=ChIJEcIUUn4v2jARYf8WWiFrisQ","lat":18.7751286,"lng":99.0600491,"approx":false,"hours_disp":"ปิดวันพ·พฤ · ศ-อ 09:00–17:00","sched":[[[540,1020]],[[540,1020]],null,null,[[540,1020]],[[540,1020]],[[540,1020]]],"phone":"+66 94 663 8855","reserve":false},{"id":79,"cat":"Bakery & Dessert","name":"Groon Bread & Brunch","zone":"ศิริมังคลาจารย์","area":"นิมมาน / สันติธรรม","tier":"S","tag":"Bread + Brunch","why":"ขนมปังและ viennoiserie ทำได้ดี","menu":"Croissant, Shokupan","budget":"150–480","bmin":150,"bmax":480,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7951686,98.9710687&query_place_id=ChIJ_x1au2I72jARdYslFFmvtjQ","lat":18.7951686,"lng":98.9710687,"approx":false,"hours_disp":"ทุกวัน 08:30–17:00","sched":[[[510,1020]],[[510,1020]],[[510,1020]],[[510,1020]],[[510,1020]],[[510,1020]],[[510,1020]]],"phone":"+66 61 582 4490","reserve":false},{"id":80,"cat":"Bakery & Dessert","name":"Baan Bakery","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"S","tag":"Budget Hidden Gem","why":"ขนมสด ราคาดี ของหมดเร็ว","menu":"Croissant, Cinnamon Roll","budget":"50–220","bmin":50,"bmax":220,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7795721,98.9897928&query_place_id=ChIJrXmM5Xgx2jAR_mYKQVRdnjc","lat":18.7795721,"lng":98.9897928,"approx":false,"hours_disp":"พ-ส 09:00–15:00 · ปิดวันอา-อ","sched":[null,null,[[540,900]],[[540,900]],[[540,900]],[[540,900]],null],"phone":"+66 89 552 9305","reserve":false},{"id":81,"cat":"Bakery & Dessert","name":"L'Opéra French Bakery","zone":"หลายสาขา","area":"หลายสาขา","tier":"A+","tag":"French Classic","why":"เบเกอรี่ฝรั่งเศสเก่าแก่","menu":"Baguette, Croissant, Éclair","budget":"80–380","bmin":80,"bmax":380,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ต่างตามสาขา","map":"https://www.google.com/maps/search/?api=1&query=18.781468,99.0031338&query_place_id=ChIJkecZlL072jARtcXyJ8plAmE","lat":18.781468,"lng":99.0031338,"approx":false,"hours_disp":"พฤ 07:00–24:00 · ศ 00:00–19:00 · ส-พ 07:00–19:00","sched":[[[420,1140]],[[420,1140]],[[420,1140]],[[420,1440]],[[0,1140]],[[420,1140]],[[420,1140]]],"phone":"+66 87 455 7645","reserve":false},{"id":82,"cat":"Bakery & Dessert","name":"Dorle Bakery","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A+","tag":"European Bakery","why":"ขนมอบยุโรปที่สื่ออาหารคัด","menu":"Bread, Pastry","budget":"100–380","bmin":100,"bmax":380,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ตรวจสอบ Maps","map":"https://www.google.com/maps/search/?api=1&query=18.823923,98.9626312&query_place_id=ChIJ3xcOFEU72jARDTGKJGV1RUs","lat":18.823923,"lng":98.9626312,"approx":true,"hours_disp":"ทุกวัน 09:00–17:00","sched":[[[540,1020]],[[540,1020]],[[540,1020]],[[540,1020]],[[540,1020]],[[540,1020]],[[540,1020]]],"phone":"+66 81 524 9625","reserve":false},{"id":83,"cat":"Bakery & Dessert","name":"Kodung Kanom Bakery","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"Local Bakery","why":"ขนมอบและเค้กหลากหลาย","menu":"Daily Pastry, Cake","budget":"80–320","bmin":80,"bmax":320,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี/จำกัด","map":"https://www.google.com/maps/search/?api=1&query=Kodung+Kanom+Bakery+Chiang+Mai","lat":18.7918463,"lng":98.9578794,"approx":true,"sched":null,"reserve":false},{"id":84,"cat":"Bakery & Dessert","name":"Biscotti House","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"European Favorite","why":"ขนมปังและขนมอบยุโรป","menu":"Bread, Croissant, Cake","budget":"100–380","bmin":100,"bmax":380,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี/จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7704163,98.9456207&query_place_id=ChIJf43BK5Yx2jARSUbjn2WaRLc","lat":18.7704163,"lng":98.9456207,"approx":false,"hours_disp":"จ-พฤ 09:00–18:00 · ศ·ส 09:00–20:00 · ปิดวันอา","sched":[[[540,1080]],[[540,1080]],[[540,1080]],[[540,1080]],[[540,1200]],[[540,1200]],null],"phone":"+66 81 820 4464","reserve":false},{"id":85,"cat":"Bakery & Dessert","name":"Baked by Babette","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"Viennoiserie","why":"ชั้นแป้งและขนมอบสไตล์ยุโรป","menu":"Pain au Chocolat, Croissant","budget":"120–420","bmin":120,"bmax":420,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=Baked+by+Babette+Chiang+Mai","lat":18.7883,"lng":98.9853,"approx":true,"sched":null,"reserve":false},{"id":86,"cat":"Bakery & Dessert","name":"Tawii Sourdough Bakehouse","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"Sourdough","why":"เหมาะกับคนชอบขนมปังหมักธรรมชาติ","menu":"Sourdough Loaf, Sandwich","budget":"120–420","bmin":120,"bmax":420,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7904668,98.9926221&query_place_id=ChIJPV8-iyIl2jARRymSfRDQxyg","lat":18.7904668,"lng":98.9926221,"approx":false,"hours_disp":"จ-ส 07:00–16:00 · ปิดวันอา","sched":[[[420,960]],[[420,960]],[[420,960]],[[420,960]],[[420,960]],[[420,960]],null],"phone":"+66 98 516 1884","reserve":false},{"id":87,"cat":"Bakery & Dessert","name":"OHU Bakery","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"Korean-style Bakery","why":"ขนมนุ่ม ครีม และงานอบสไตล์เกาหลี","menu":"Bread, Cake, Pastry","budget":"120–420","bmin":120,"bmax":420,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี/จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7834224,98.9887535&query_place_id=ChIJjbxdUeo72jARnsVldC8ZXaE","lat":18.7834224,"lng":98.9887535,"approx":false,"hours_disp":"ปิดวันจ-พฤ · ศ-อา 11:00–18:00","sched":[null,null,null,null,[[660,1080]],[[660,1080]],[[660,1080]]],"phone":"+66 65 686 5991","reserve":false},{"id":88,"cat":"Bakery & Dessert","name":"Nana Bakery","zone":"หลายสาขา","area":"หลายสาขา","tier":"A","tag":"Daily Bakery","why":"ขนมปังประจำวันคุณภาพดี","menu":"Rye Sourdough, Baguette","budget":"70–320","bmin":70,"bmax":320,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ต่างตามสาขา","map":"https://www.google.com/maps/search/?api=1&query=18.817129,99.0112461&query_place_id=ChIJqWGOAUA72jARqYIok39RWis","lat":18.817129,"lng":99.0112461,"approx":false,"hours_disp":"ทุกวัน 07:00–20:00","sched":[[[420,1200]],[[420,1200]],[[420,1200]],[[420,1200]],[[420,1200]],[[420,1200]],[[420,1200]]],"phone":"+66 61 429 4833","reserve":false},{"id":89,"cat":"Bakery & Dessert","name":"Caramellow","zone":"มหิดล","area":"ใต้เมือง / หางดง","tier":"A","tag":"All-round Dessert","why":"เค้กและขนมหวานมาตรฐานดี","menu":"Cake, Caramel Dessert","budget":"120–400","bmin":120,"bmax":400,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มี","map":"https://www.google.com/maps/search/?api=1&query=18.768318,98.9809659&query_place_id=ChIJ36Nwxscx2jARH63elgQPQv8","lat":18.768318,"lng":98.9809659,"approx":false,"hours_disp":"ทุกวัน 09:00–19:00","sched":[[[540,1140]],[[540,1140]],[[540,1140]],[[540,1140]],[[540,1140]],[[540,1140]],[[540,1140]]],"phone":"+66 53 284 114","reserve":false},{"id":90,"cat":"Street Food & Local","name":"ข้าวซอยคุณยาย","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"S","tag":"Khao Soi Local","why":"ร้านข้าวซอยขนาดเล็กที่นักกินตามไป","menu":"ข้าวซอยไก่/เนื้อ","budget":"50–120","bmin":50,"bmax":120,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7953284,98.9831449&query_place_id=ChIJX4UC5ZA62jARc0S5-3rUIok","lat":18.7953284,"lng":98.9831449,"approx":false,"hours_disp":"จ-ส 10:00–14:00 · ปิดวันอา","sched":[[[600,840]],[[600,840]],[[600,840]],[[600,840]],[[600,840]],[[600,840]],null],"phone":"+66 90 651 7088","reserve":false},{"id":91,"cat":"Street Food & Local","name":"ประตูเชียงใหม่ Food Market","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"S","tag":"Night Market","why":"รวมอาหาร street food หลากหลาย","menu":"ไส้อั่ว, ขนมจีน, ของทอด","budget":"50–250","bmin":50,"bmax":250,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"รอบตลาด","map":"https://www.google.com/maps/search/?api=1&query=18.7815359,98.9884853&query_place_id=ChIJczgL0Z862jARSHxf7Vv4QMk","lat":18.7815359,"lng":98.9884853,"approx":false,"hours_disp":"ทุกวัน 24 ชม.","sched":["24h","24h","24h","24h","24h","24h","24h"],"reserve":false},{"id":92,"cat":"Street Food & Local","name":"ประตูช้างเผือก Food Market","zone":"ช้างเผือก","area":"เหนือเมือง / แม่ริม","tier":"S","tag":"Night Market","why":"ตลาดกลางคืนที่มีร้านเด็ดหลายเจ้า","menu":"ข้าวขาหมู, สุกี้, ของหวาน","budget":"50–250","bmin":50,"bmax":250,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"รอบตลาด","map":"https://www.google.com/maps/search/?api=1&query=18.7959656,98.9859749&query_place_id=ChIJjYX8KZE62jARGVvq4D7Txm8","lat":18.7959656,"lng":98.9859749,"approx":false,"hours_disp":"ทุกวัน 17:00–24:00","sched":[[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]]],"reserve":false},{"id":93,"cat":"Street Food & Local","name":"สุกี้ช้างเผือก","zone":"ช้างเผือก","area":"เหนือเมือง / แม่ริม","tier":"S","tag":"Street Food Legend","why":"สุกี้แห้งกระทะร้อนชื่อดัง","menu":"สุกี้แห้ง","budget":"60–150","bmin":60,"bmax":150,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.795817,98.9853308&query_place_id=ChIJLZpb1ZY62jARLKcPSve6r0k","lat":18.795817,"lng":98.9853308,"approx":false,"hours_disp":"ทุกวัน 17:30–24:00","sched":[[[1050,1440]],[[1050,1440]],[[1050,1440]],[[1050,1440]],[[1050,1440]],[[1050,1440]],[[1050,1440]]],"phone":"+66 62 942 8874","reserve":false},{"id":94,"cat":"Street Food & Local","name":"ข้าวขาหมูช้างเผือก","zone":"ช้างเผือก","area":"เหนือเมือง / แม่ริม","tier":"A+","tag":"Night Market Icon","why":"ข้าวขาหมูเจ้าดังในตลาด","menu":"ข้าวขาหมู","budget":"60–150","bmin":60,"bmax":150,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7958195,98.9855155&query_place_id=ChIJG9eEK5E62jARDb2Ukq5XTNM","lat":18.7958195,"lng":98.9855155,"approx":false,"hours_disp":"ทุกวัน 17:00–24:00","sched":[[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]]],"reserve":false},{"id":95,"cat":"Street Food & Local","name":"Tue Ka Ko Na Prince","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A+","tag":"Michelin Street Snack","why":"ของทอดท้องถิ่นที่ Michelin คัด","menu":"ตือคาโค","budget":"30–100","bmin":30,"bmax":100,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7962248,99.0062121&query_place_id=ChIJaZB7arE62jAR6kXAAHebzNg","lat":18.7962248,"lng":99.0062121,"approx":false,"hours_disp":"จ 09:00–16:00 · ปิดวันอ-พฤ · ศ·ส 09:00–16:00 · อา 09:00–17:00","sched":[[[540,960]],null,null,null,[[540,960]],[[540,960]],[[540,1020]]],"phone":"+66 91 072 5891","reserve":false},{"id":96,"cat":"Street Food & Local","name":"ก๋วยเตี๋ยวหลุดโลก","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"Noodle Favorite","why":"ร้านก๋วยเตี๋ยวคาแรกเตอร์ชัด","menu":"ก๋วยเตี๋ยวต้มยำ","budget":"70–180","bmin":70,"bmax":180,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ตรวจสอบ Maps","map":"https://www.google.com/maps/search/?api=1&query=18.8096995,98.974772&query_place_id=ChIJR_OUf4g62jARIvvgZMGck5I","lat":18.8096995,"lng":98.974772,"approx":true,"sched":null,"reserve":false},{"id":97,"cat":"Street Food & Local","name":"ป้าหล้าอาหารตามสั่ง","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A","tag":"Local Thai","why":"อาหารตามสั่งรสจัดแบบคนพื้นที่","menu":"กะเพรา, ผัดเผ็ด","budget":"60–180","bmin":60,"bmax":180,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.792085,99.0014968&query_place_id=ChIJt_-prLo62jAR3XV9iG7dIF4","lat":18.792085,"lng":99.0014968,"approx":true,"hours_disp":"ทุกวัน 17:00–24:00","sched":[[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]]],"reserve":false},{"id":98,"cat":"Street Food & Local","name":"ตลาดวโรรส","zone":"กาดหลวง","area":"เมืองเก่า / ท่าแพ","tier":"A","tag":"Local Market","why":"แหล่งซื้อของกินเหนือและของฝาก","menu":"ไส้อั่ว, แคบหมู, น้ำพริก","budget":"50–500","bmin":50,"bmax":500,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"อาคาร/รอบตลาด","map":"https://www.google.com/maps/search/?api=1&query=18.7898494,99.0009964&query_place_id=ChIJUXF8Lzo72jARQGy1_Bh_wCQ","lat":18.7898494,"lng":99.0009964,"approx":false,"hours_disp":"ทุกวัน 06:00–17:00","sched":[[[360,1020]],[[360,1020]],[[360,1020]],[[360,1020]],[[360,1020]],[[360,1020]],[[360,1020]]],"phone":"+66 53 232 592","reserve":false},{"id":99,"cat":"Street Food & Local","name":"กาดหน้ามอ","zone":"หน้า มช.","area":"มช. / สุเทพ","tier":"A","tag":"Student Night Market","why":"ร้านกินเล่นและอาหารราคาดี","menu":"ของทอด, ชาบู, ของหวาน","budget":"50–300","bmin":50,"bmax":300,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ลาน/ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.8075635,98.9565584&query_place_id=ChIJHfN2Z_472jAR49EZq-ux5Y0","lat":18.8075635,"lng":98.9565584,"approx":true,"hours_disp":"อ 10:00–21:00 · พ 09:00–21:00 · พฤ-ส 09:30–21:00 · อา·จ 09:00–21:00","sched":[[[540,1260]],[[600,1260]],[[540,1260]],[[570,1260]],[[570,1260]],[[570,1260]],[[540,1260]]],"phone":"+66 81 716 2491","reserve":false},{"id":100,"cat":"Street Food & Local","name":"ขนมจีนสันป่าข่อย","zone":"สันป่าข่อย","area":"ริมปิง / วัดเกต","tier":"A+","tag":"Local Noodle","why":"ขนมจีนหลายแกงและคนพื้นที่นิยม","menu":"น้ำเงี้ยว, แกงเขียวหวาน","budget":"60–150","bmin":60,"bmax":150,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7856652,99.0085993&query_place_id=ChIJ69_v9Ks62jARv7Pq_K3qQS4","lat":18.7856652,"lng":99.0085993,"approx":false,"hours_disp":"จ-ส 11:00–23:00 · ปิดวันอา","sched":[[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]],[[660,1380]],null],"reserve":false},{"id":101,"cat":"Street Food & Local","name":"ไก่ทอดเที่ยงคืน","zone":"กำแพงดิน","area":"เมืองเก่า / ท่าแพ","tier":"A","tag":"Late-night Local","why":"ร้านไก่ทอดชื่อดังสำหรับมื้อดึก","menu":"ไก่ทอด, ข้าวเหนียว","budget":"60–200","bmin":60,"bmax":200,"hours":"ตรวจสอบล่าสุดผ่าน Google Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7799347,98.9981414&query_place_id=ChIJI74JhvAx2jARzRGIDINaFDA","lat":18.7799347,"lng":98.9981414,"approx":false,"hours_disp":"อ-ส 18:00–01:00 · ปิดวันอา·จ","sched":[null,[[1080,1500]],[[1080,1500]],[[1080,1500]],[[1080,1500]],[[1080,1500]],null],"phone":"+66 89 433 0813","reserve":false},{"id":102,"cat":"อาหารตามสั่ง","name":"ป้าตุ้ยตามสั่ง","zone":"สันป่าข่อย / ตลาดทองคำ","area":"ริมปิง / วัดเกต","tier":"S+","tag":"ตามสั่งเด็ด","why":"ร้านลับเก่าแก่ หมูกรอบเป็นเอกลักษณ์ รสจัดถึงเครื่องและราคาดี","menu":"หมูกรอบไข่เยี่ยวม้ากะเพรากรอบ, ฉู่ฉี่หมูกรอบไข่ดาว","budget":"50–120","bmin":50,"bmax":120,"hours":"08:00–19:00","closed":"เปิดทุกวัน","parking":"จอดบริเวณตลาดทองคำ/ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7857105,99.0084406&query_place_id=ChIJ77pL9Ks62jARNJW6yclCgK8","note":"ร้านอยู่ในซอยข้างตลาดทองคำ ไปช่วงเที่ยงอาจรอ","src":"https://www.wongnai.com/news/patui-chaingmai","checked":"4 ส.ค. 2026","lat":18.7857105,"lng":99.0084406,"approx":true,"hours_disp":"ทุกวัน 16:00–23:00","sched":[[[960,1380]],[[960,1380]],[[960,1380]],[[960,1380]],[[960,1380]],[[960,1380]],[[960,1380]]],"reserve":false},{"id":103,"cat":"อาหารตามสั่ง","name":"ลุงปั๋นอาหารตามสั่ง","zone":"ตลาดทิพย์เนตร","area":"ใต้เมือง / หางดง","tier":"S","tag":"ตามสั่งเด็ด","why":"ร้านจานด่วนขวัญใจคนพื้นที่ เปิดยาว ปริมาณคุ้มและเมนูหมูกรอบเด่น","menu":"คะน้าหมูกรอบไข่ดาว, กะเพราหมูไข่ดาว, พริกแกงหมู","budget":"50–130","bmin":50,"bmax":130,"hours":"24 ชั่วโมง","closed":"เปิดทุกวัน","parking":"จอดรอบตลาด/ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=%E0%B8%A5%E0%B8%B8%E0%B8%87%E0%B8%9B%E0%B8%B1%E0%B9%8B%E0%B8%99%E0%B8%AD%E0%B8%B2%E0%B8%AB%E0%B8%B2%E0%B8%A3%E0%B8%95%E0%B8%B2%E0%B8%A1%E0%B8%AA%E0%B8%B1%E0%B9%88%E0%B8%87+%E0%B8%95%E0%B8%A5%E0%B8%B2%E0%B8%94%E0%B8%97%E0%B8%B4%E0%B8%9E%E0%B8%A2%E0%B9%8C%E0%B9%80%E0%B8%99%E0%B8%95%E0%B8%A3","note":"เหมาะมื้อดึก แต่ควรตรวจสถานะใน Maps ก่อนออกเดินทาง","src":"https://www.wongnai.com/restaurants/97089kw","checked":"4 ส.ค. 2026","lat":18.7883,"lng":98.9853,"approx":true,"sched":null,"reserve":false},{"id":104,"cat":"อาหารตามสั่ง","name":"วริศรา อาหารตามสั่งหน้า มช.","zone":"หน้า มหาวิทยาลัยเชียงใหม่","area":"มช. / สุเทพ","tier":"S","tag":"ตามสั่งเด็ด","why":"อาหารตามสั่งรสเข้ม เมนูเยอะและราคานักศึกษา มีจานกับข้าวที่ทำได้ดีกว่าร้านทั่วไป","menu":"ปลาหมึกผัดไข่เค็ม, ยำผักบุ้งทอดกรอบ, ไก่ผัดเม็ดมะม่วง, ต้มแซ่บหมู","budget":"70–180","bmin":70,"bmax":180,"hours":"ตรวจสอบเวลาใน Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน/ลานใกล้หน้า มช.","map":"https://www.google.com/maps/search/?api=1&query=18.8075635,98.9565584&query_place_id=ChIJHfN2Z_472jAR49EZq-ux5Y0","note":"เหมาะไปหลายคนเพื่อสั่งกับข้าวแชร์","src":"https://www.wongnai.com/restaurants/1133312IO","checked":"4 ส.ค. 2026","lat":18.8075635,"lng":98.9565584,"approx":true,"hours_disp":"อ 10:00–21:00 · พ 09:00–21:00 · พฤ-ส 09:30–21:00 · อา·จ 09:00–21:00","sched":[[[540,1260]],[[600,1260]],[[540,1260]],[[570,1260]],[[570,1260]],[[570,1260]],[[540,1260]]],"phone":"+66 81 716 2491","reserve":false},{"id":105,"cat":"อาหารตามสั่ง","name":"ครัวป้าตอง","zone":"สนามกอล์ฟสตาร์โดม","area":"ใต้เมือง / หางดง","tier":"S","tag":"ตามสั่งเด็ด","why":"ร้านตามสั่งเก่าแก่กว่า 10 ปี ฝีมือครัวจริงจังและเมนูมีคาแรกเตอร์","menu":"อาหารทะเลผัด, กะเพรา, เมนูตามสั่งสูตรร้าน","budget":"80–220","bmin":80,"bmax":220,"hours":"ตรวจสอบเวลาใน Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"มีที่จอดในพื้นที่สตาร์โดม","map":"https://www.google.com/maps/search/?api=1&query=18.7817067,98.9751937&query_place_id=ChIJSeiLCII62jARGWJo4Et4X6k","note":"อยู่ภายในสนามกอล์ฟ ควรเช็กตำแหน่งก่อนเข้า","src":"https://www.wongnai.com/news/pa-thong-chiangmai","checked":"4 ส.ค. 2026","lat":18.7817067,"lng":98.9751937,"approx":true,"hours_disp":"จ 10:00–22:00 · อ-อา 18:00–22:00","sched":[[[600,1320]],[[1080,1320]],[[1080,1320]],[[1080,1320]],[[1080,1320]],[[1080,1320]],[[1080,1320]]],"reserve":false},{"id":106,"cat":"อาหารตามสั่ง","name":"ร้านข้าวควาย","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A+","tag":"ตามสั่งเด็ด","why":"จุดเด่นคือปริมาณใหญ่ ราคาคุ้ม เหมาะกับคนหิวและสายอาหารจานเดียว","menu":"กะเพราราดข้าว, ผัดพริกแกง, อาหารตามสั่งจานใหญ่","budget":"60–150","bmin":60,"bmax":150,"hours":"ตรวจสอบเวลาใน Maps","closed":"ตรวจสอบสถานะร้านปัจจุบัน","parking":"ตรวจสอบตามพิกัดปัจจุบัน","map":"https://www.google.com/maps/search/?api=1&query=18.8099482,98.9751193&query_place_id=ChIJX4U_NCc72jARykhQJd2hp5Q","note":"ควรเช็กว่าสาขา/พิกัดยังให้บริการก่อนเดินทาง","src":"https://www.wongnai.com/news/kaow-kwai-cm","checked":"4 ส.ค. 2026","lat":18.8099482,"lng":98.9751193,"approx":true,"hours_disp":"ทุกวัน 10:30–22:00","sched":[[[630,1320]],[[630,1320]],[[630,1320]],[[630,1320]],[[630,1320]],[[630,1320]],[[630,1320]]],"reserve":false},{"id":107,"cat":"อาหารตามสั่ง","name":"น้ำเงี้ยวป้ารุณ","zone":"เชียงใหม่","area":"ทั่วเมือง","tier":"A+","tag":"ตามสั่งเด็ด","why":"แม้เด่นที่น้ำเงี้ยว แต่มีอาหารตามสั่งหลายเมนูและเป็นร้าน local เปิดมานาน","menu":"ขนมจีนน้ำเงี้ยว, อาหารตามสั่งประจำวัน","budget":"60–160","bmin":60,"bmax":160,"hours":"08:00–19:00","closed":"จันทร์–เสาร์; ปิดวันอาทิตย์","parking":"ริมถนน/ใกล้ร้าน","map":"https://www.google.com/maps/search/?api=1&query=18.7959703,98.9717799&query_place_id=ChIJe-Sv_og62jARM7LMjYEujRY","note":"เหมาะมื้อเช้า–กลางวัน เมนูบางอย่างอาจหมด","src":"https://www.facebook.com/Wongnai/posts/5703421133009098/","checked":"4 ส.ค. 2026","lat":18.7959703,"lng":98.9717799,"approx":false,"hours_disp":"จ-ส 08:00–19:00 · อา 08:00–14:00","sched":[[[480,1140]],[[480,1140]],[[480,1140]],[[480,1140]],[[480,1140]],[[480,1140]],[[480,840]]],"phone":"+66 87 188 4212","reserve":false},{"id":108,"cat":"อาหารตามสั่ง","name":"อาหารตามสั่งสันติธรรม","zone":"สันติธรรม","area":"นิมมาน / สันติธรรม","tier":"A","tag":"ตามสั่งเด็ด","why":"กะเพราข้าวคลุกซอสเข้ม เป็นร้านประจำย่านที่รีวิวชื่นชมเรื่องรสชาติ","menu":"ผัดกะเพราข้าวคลุก","budget":"50–120","bmin":50,"bmax":120,"hours":"ตรวจสอบเวลาใน Maps","closed":"ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.8008861,98.980534&query_place_id=ChIJGxbIMic72jARaMgaUdQjgLY","note":"ชื่อร้านค่อนข้างทั่วไป ให้กด Maps จากลิงก์ในแถวนี้","src":"https://www.wongnai.com/restaurants/646350Ed","checked":"4 ส.ค. 2026","lat":18.8008861,"lng":98.980534,"approx":true,"hours_disp":"ทุกวัน 18:00–05:00","sched":[[[1080,1740]],[[1080,1740]],[[1080,1740]],[[1080,1740]],[[1080,1740]],[[1080,1740]],[[1080,1740]]],"reserve":false},{"id":109,"cat":"อาหารตามสั่ง","name":"ป้าหล้าอาหารตามสั่ง หลังโรงเรียนโกวิท","zone":"ช้างเผือก","area":"เหนือเมือง / แม่ริม","tier":"A","tag":"ตามสั่งเด็ด","why":"ร้านตามสั่ง local ที่มีทั้งอาหารจานเดียวและอาหารทะเล ราคาเข้าถึงง่าย","menu":"กะเพรา, ผัดพริกแกง, อาหารทะเลตามสั่ง","budget":"60–160","bmin":60,"bmax":160,"hours":"เริ่มประมาณ 08:30","closed":"เปิดตามข้อมูลแพลตฟอร์ม; ตรวจสอบวันหยุดล่าสุด","parking":"ริมถนน/หน้าร้าน","map":"https://www.google.com/maps/search/?api=1&query=18.792085,99.0014968&query_place_id=ChIJt_-prLo62jAR3XV9iG7dIF4","note":"ร้านเป็นเต็นท์/ร้านริมทาง จุดสังเกตควรดูจาก Maps","src":"https://www.wongnai.com/restaurants/584205Qm","checked":"4 ส.ค. 2026","lat":18.792085,"lng":99.0014968,"approx":true,"hours_disp":"ทุกวัน 17:00–24:00","sched":[[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]],[[1020,1440]]],"reserve":false},{"id":110,"cat":"International","name":"Lucky's Vietnamese Restaurant","zone":"สันติธรรม","area":"นิมมาน / สันติธรรม","tier":"S+","tag":"Vietnamese Gem","why":"อาหารเวียดนามแท้ เมนูมีแค่ไม่กี่จานแต่ทำได้ลึกซึ้งมาก บุนชาเทียบชั้นฮานอย คนแน่นแทบทุกมื้อ","menu":"Bun Cha, Nem Nuong Nha Trang, กาแฟมะพร้าว","budget":"150–350","bmin":150,"bmax":350,"parking":"มีที่จอดจำกัดด้านหลังร้าน","map":"https://www.google.com/maps/search/?api=1&query=18.8047105,98.9779535&query_place_id=ChIJCQZRVNE72jARSfyzl4ZCAJY","lat":18.8047105,"lng":98.9779535,"approx":false,"hours_disp":"ทุกวัน 09:00–20:00","sched":[[[540,1200]],[[540,1200]],[[540,1200]],[[540,1200]],[[540,1200]],[[540,1200]],[[540,1200]]],"phone":"+66 62 294 9402","reserve":true},{"id":111,"cat":"Bar & Cocktail","name":"Nophaburi Bar","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"S+","tag":"Local Hidden Gem","why":"บาร์ค็อกเทลใช้เหล้าไทยล้วน รสชาติซับซ้อนไม่แพ้บาร์ระดับโลก คนท้องถิ่นและบาร์เทนเดอร์ยกให้เป็นเบอร์ต้นๆ ของเมือง","menu":"Thai-spirit Cocktails, Smoky Cinnamon Rum","budget":"250–500","bmin":250,"bmax":500,"parking":"ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.783216,98.98183&query_place_id=ChIJ-YEoDp062jARYc_y1XjZzoY","lat":18.783216,"lng":98.98183,"approx":false,"hours_disp":"จ·อ 18:00–24:00 · ปิดวันพ · พฤ-อา 18:00–24:00","sched":[[[1080,1440]],[[1080,1440]],null,[[1080,1440]],[[1080,1440]],[[1080,1440]],[[1080,1440]]],"phone":"+66 96 665 1665","reserve":false},{"id":112,"cat":"Bar & Cocktail","name":"My Beer Friend Market","zone":"ช้างม่อย","area":"เมืองเก่า / ท่าแพ","tier":"S","tag":"Craft Beer Local","why":"ร้านคราฟต์เบียร์ลับกลางเมือง บรรยากาศเรียบง่ายไม่ปรุงแต่ง เหมาะสายเบียร์ที่เอาจริง","menu":"Craft Beer Flight, IPA on Tap","budget":"200–450","bmin":200,"bmax":450,"parking":"ริมถนน/จำกัด","map":"https://www.google.com/maps/search/?api=1&query=18.7902406,98.9942188&query_place_id=ChIJ9bKjGqM62jARaAXHTurEmcs","lat":18.7902406,"lng":98.9942188,"approx":false,"sched":null,"phone":"+66 89 632 4226","reserve":false},{"id":113,"cat":"Bar & Cocktail","name":"Ping's Bar","zone":"ไนท์บาซาร์","area":"ช้างคลาน / ไนท์บาซาร์","tier":"A+","tag":"Hotel Luxe Bar","why":"บาร์ในล็อบบี้โรงแรมระดับห้าดาว ค็อกเทลทำมือประณีต เหมาะเดตหรูหรือฉลองพิเศษ","menu":"Mojito, Weng Weng Cocktail","budget":"350–700","bmin":350,"bmax":700,"parking":"จอดในโรงแรม","map":"https://www.google.com/maps/search/?api=1&query=18.7845474,98.999928&query_place_id=ChIJQxfqXKY62jAR35fvJcXnOfg","lat":18.7845474,"lng":98.999928,"approx":false,"hours_disp":"ทุกวัน 06:00–22:00","sched":[[[360,1320]],[[360,1320]],[[360,1320]],[[360,1320]],[[360,1320]],[[360,1320]],[[360,1320]]],"phone":"+66 53 253 666","reserve":false},{"id":114,"cat":"Bar & Cocktail","name":"The White Rabbit","zone":"เมืองเก่า","area":"เมืองเก่า / ท่าแพ","tier":"S+","tag":"Speakeasy","why":"Speakeasy ซ่อนอยู่ในตรอกเมืองเก่า ต้องเดินขึ้นบันไดไปหา ค็อกเทลระดับท็อปของเชียงใหม่","menu":"Mr. Sunshine, Signature Speakeasy Menu","budget":"350–650","bmin":350,"bmax":650,"parking":"จอดยาก/ริมถนน","map":"https://www.google.com/maps/search/?api=1&query=18.7944214,98.987067&query_place_id=ChIJbUQN-wU72jARjf-TXrKPG_g","lat":18.7944214,"lng":98.987067,"approx":false,"hours_disp":"ทุกวัน 18:00–24:00","sched":[[[1080,1440]],[[1080,1440]],[[1080,1440]],[[1080,1440]],[[1080,1440]],[[1080,1440]],[[1080,1440]]],"phone":"+66 64 260 2669","reserve":false},{"id":115,"cat":"Bar & Cocktail","name":"Woods Bar, Rooftop 5fl.","zone":"ช้างเผือก","area":"ริมปิง / วัดเกต","tier":"A+","tag":"Rooftop View","why":"รูฟท็อปสูงมองเห็นเมืองและดอยสุเทพ บรรยากาศชิลๆ ราคาย่อมเยากว่ารูฟท็อปอื่นในระดับเดียวกัน","menu":"Craft Beer, BBQ Skewers, Sunset View","budget":"200–450","bmin":200,"bmax":450,"parking":"มีที่จอดของโรงแรม","map":"https://www.google.com/maps/search/?api=1&query=18.8038853,98.9697895&query_place_id=ChIJbZ5IrNM72jARP3tzRzhNyEk","lat":18.8038853,"lng":98.9697895,"approx":false,"sched":null,"reserve":false},{"id":116,"cat":"Bar & Cocktail","name":"ARISE Rooftop Bar","zone":"นิมมาน","area":"นิมมาน / สันติธรรม","tier":"S","tag":"Stylish Rooftop","why":"รูฟท็อปสไตล์หรูใจกลางนิมมาน ไม่โอ้อวดเกินไป ค็อกเทลและวิวพระอาทิตย์ตกยอดเยี่ยม","menu":"Burnt Lemon Margarita, Sunset Cocktails","budget":"350–700","bmin":350,"bmax":700,"parking":"จอดในอาคาร One Nimman ใกล้เคียง","map":"https://www.google.com/maps/search/?api=1&query=18.7972994,98.9694285&query_place_id=ChIJGxdHxYk62jARhD_igQDREvA","lat":18.7972994,"lng":98.9694285,"approx":false,"hours_disp":"ทุกวัน 15:00–24:00","sched":[[[900,1440]],[[900,1440]],[[900,1440]],[[900,1440]],[[900,1440]],[[900,1440]],[[900,1440]]],"phone":"+66 53 216 219","reserve":false}];
+
+/* ---- storage: ทำงานได้ทั้งตอน preview และตอน host จริง ---- */
+const store = (()=>{
+  let mem = {};
+  const ok = (()=>{ try{ localStorage.setItem('_t','1'); localStorage.removeItem('_t'); return true; }catch(e){ return false; } })();
+  return {
+    get(k,d){ try{ const v = ok? localStorage.getItem(k) : mem[k]; return v? JSON.parse(v):d; }catch(e){ return d; } },
+    set(k,v){ const s=JSON.stringify(v); try{ ok? localStorage.setItem(k,s) : (mem[k]=s); }catch(e){ mem[k]=s; } }
+  };
+})();
+
+let favs = new Set(store.get('cm_favs',[]));
+let done = new Set(store.get('cm_done',[]));
+let favDays = store.get('cm_favdays',{});
+let maxDay = store.get('cm_maxday',1);
+const saveFavs = ()=>store.set('cm_favs',[...favs]);
+const saveDone = ()=>store.set('cm_done',[...done]);
+const saveFavDays = ()=>store.set('cm_favdays',favDays);
+function getDay(id){ return favDays[id] || 1; }
+function setDay(id, day){ favDays[id]=day; saveFavDays(); render(); }
+function addDay(){ if(maxDay<7){ maxDay++; store.set('cm_maxday',maxDay); } state.activeDay = maxDay; render(); }
+function daysInUse(){
+  const s = new Set([1]);
+  favs.forEach(id=>s.add(getDay(id)));
+  for(let d=1; d<=maxDay; d++) s.add(d);
+  return [...s].sort((a,b)=>a-b);
+}
+
+const TIERC = {'S+':'var(--gold)','S':'var(--jade)','A+':'var(--sky)','A':'var(--dimmer)'};
+const TIERHEX = {'S+':'#e2b04a','S':'#56a58a','A+':'#7fa3c9','A':'#666c7a'};
+const TIERS = ['S+','S','A+','A'];
+const CATICON = {
+  'Cafe & Coffee':'คาเฟ่','Breakfast & Brunch':'บรันช์','อาหารเหนือ':'อาหารเหนือ',
+  'Thai & Fine Dining':'ไทย/ไฟน์ไดน์','International':'อินเตอร์','Bakery & Dessert':'เบเกอรี่/ของหวาน',
+  'Street Food & Local':'สตรีทฟู้ด','อาหารตามสั่ง':'ตามสั่ง','Bar & Cocktail':'บาร์/ค็อกเทล'
+};
+
+const state = { q:'', cat:'ALL', tiers:new Set(), area:'ALL', budget:99999, sort:'tier', plan:false, view:'grid', openNow:false, near:false, reserveOnly:false, activeDay:'all' };
+let userLoc = null;
+
+/* ---- Bangkok time & open-now logic ---- */
+function bangkokNow(){
+  const parts = new Intl.DateTimeFormat('en-US', {timeZone:'Asia/Bangkok', weekday:'short', hour:'2-digit', minute:'2-digit', hour12:false}).formatToParts(new Date());
+  const map = {}; parts.forEach(p=>map[p.type]=p.value);
+  const wd = {Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6}[map.weekday];
+  let hh = parseInt(map.hour,10); if(hh===24) hh=0;
+  return wd*1440 + hh*60 + parseInt(map.minute,10);
+}
+function isOpenNow(sched){
+  if(!sched) return null;
+  const nowAbs = bangkokNow(); // 0..10079, minutes since Monday 00:00 Bangkok time
+  for(let d=0; d<7; d++){
+    const cell = sched[d];
+    if(!cell) continue;
+    if(cell==='24h') return true;
+    for(const [s,e] of cell){
+      const start = d*1440 + s, end = d*1440 + e; // end may exceed 10080 for Sun overnight
+      if(nowAbs>=start && nowAbs<end) return true;
+      if(nowAbs+10080>=start && nowAbs+10080<end) return true;
+      if(nowAbs-10080>=start && nowAbs-10080<end) return true;
+    }
+  }
+  return false;
+}
+function minutesUntilClose(sched){
+  if(!sched) return null;
+  const nowAbs = bangkokNow();
+  for(let d=0; d<7; d++){
+    const cell = sched[d];
+    if(!cell || cell==='24h') continue;
+    for(const [s,e] of cell){
+      const start = d*1440 + s, end = d*1440 + e;
+      if(nowAbs>=start && nowAbs<end) return end-nowAbs;
+      if(nowAbs+10080>=start && nowAbs+10080<end) return end-(nowAbs+10080);
+      if(nowAbs-10080>=start && nowAbs-10080<end) return end-(nowAbs-10080);
+    }
+  }
+  return null;
+}
+function haversineKm(lat1,lng1,lat2,lng2){
+  const R=6371, toRad=x=>x*Math.PI/180;
+  const dLat=toRad(lat2-lat1), dLng=toRad(lng2-lng1);
+  const s=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
+}
+const TIERLABEL = {'S+':'ห้ามพลาด — ระดับ S+','S':'ยอดเยี่ยม — ระดับ S','A+':'ดีมาก — ระดับ A+','A':'ดี — ระดับ A'};
+let map, mapLayer, routeLayer, liveLayer, previewLayer;
+let liveWatchId = null, liveMarker = null;
+let currentRoutes = {}; // zoneKey -> {latlngs, ordered, color}
+let previewAnimId = null;
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---- init header stats ---- */
+const areas = [...new Set(DATA.map(r=>r.area))].sort((a,b)=>a.localeCompare(b,'th'));
+$('#stTotal').textContent = DATA.length;
+$('#stTop').textContent = DATA.filter(r=>r.tier==='S+'||r.tier==='S').length;
+$('#stZone').textContent = areas.length;
+$('#gZone2').textContent = areas.length;
+$('#gReserve').textContent = DATA.filter(r=>r.reserve).length;
+function updateGlanceOpen(){
+  $('#gOpen').textContent = DATA.filter(r=>isOpenNow(r.sched)===true).length;
+}
+updateGlanceOpen();
+setInterval(updateGlanceOpen, 60000);
+
+/* ---- build controls ---- */
+const cats = [...new Set(DATA.map(r=>r.cat))];
+$('#catChips').innerHTML = [['ALL','ทั้งหมด',DATA.length]]
+  .concat(cats.map(c=>[c, CATICON[c]||c, DATA.filter(r=>r.cat===c).length]))
+  .map(([v,l,n])=>`<button class="chip${v==='ALL'?' on':''}" data-cat="${esc(v)}">${esc(l)}<span class="n">${n}</span></button>`).join('');
+
+$('#tierPills').innerHTML = TIERS.map(t=>`<button class="pill" data-tier="${t}">${t}</button>`).join('');
+const BUDGETS = [[150,'150 บ.'],[300,'300 บ.'],[600,'600 บ.'],[1200,'1,200 บ.'],[99999,'ไม่จำกัด']];
+$('#budgetPills').innerHTML = BUDGETS.map(([v,l])=>`<button class="pill${v===99999?' on':''}" data-budget="${v}">${l}</button>`).join('');
+$('#areaSel').innerHTML = `<option value="ALL">ทุกโซน</option>` +
+  areas.map(a=>`<option value="${esc(a)}">${esc(a)} (${DATA.filter(r=>r.area===a).length})</option>`).join('');
+
+/* ---- filtering ---- */
+function filtered(){
+  let out = DATA.filter(r=>{
+    if(state.plan && !favs.has(r.id)) return false;
+    if(state.plan && state.activeDay!=='all' && getDay(r.id)!==state.activeDay) return false;
+    if(state.cat!=='ALL' && r.cat!==state.cat) return false;
+    if(state.tiers.size && !state.tiers.has(r.tier)) return false;
+    if(state.area!=='ALL' && r.area!==state.area) return false;
+    if(r.bmin>state.budget) return false;
+    if(state.openNow && isOpenNow(r.sched)!==true) return false;
+    if(state.reserveOnly && !r.reserve) return false;
+    if(state.q){
+      const hay = (r.name+' '+r.menu+' '+r.zone+' '+r.area+' '+r.tag+' '+r.why+' '+r.cat).toLowerCase();
+      if(!state.q.toLowerCase().split(/\s+/).every(w=>hay.includes(w))) return false;
+    }
+    return true;
+  });
+  const ti = t=>TIERS.indexOf(t);
+  const cmp = {
+    tier:(a,b)=>ti(a.tier)-ti(b.tier) || a.bmin-b.bmin,
+    cheap:(a,b)=>a.bmin-b.bmin || ti(a.tier)-ti(b.tier),
+    rich:(a,b)=>b.bmax-a.bmax || ti(a.tier)-ti(b.tier),
+    name:(a,b)=>a.name.localeCompare(b.name,'th'),
+    zone:(a,b)=>a.area.localeCompare(b.area,'th') || ti(a.tier)-ti(b.tier)
+  }[state.sort];
+  if(state.near && userLoc){
+    out.sort((a,b)=> haversineKm(userLoc.lat,userLoc.lng,a.lat,a.lng) - haversineKm(userLoc.lat,userLoc.lng,b.lat,b.lng));
+  } else {
+    out.sort(cmp);
+  }
+  return out;
+}
+
+/* ---- card ---- */
+function openBadge(sched){
+  const st = isOpenNow(sched);
+  if(st===null) return '';
+  if(st){
+    const left = minutesUntilClose(sched);
+    if(left!==null && left<=60){
+      const txt = left<60 ? `ปิดใน ${left} นาที` : `ปิดใน 1 ชม.`;
+      return `<span class="openbadge soon"><span class="dotlive"></span>${txt}</span>`;
+    }
+    return `<span class="openbadge open"><span class="dotlive"></span>เปิดอยู่</span>`;
+  }
+  return `<span class="openbadge closed"><span class="dotlive"></span>ปิดแล้ว</span>`;
+}
+function card(r){
+  return `<article class="card${done.has(r.id)?' done':''}" data-id="${r.id}" style="--tier:${TIERC[r.tier]}" tabindex="0" role="button">
+    <div class="chead">
+      <h3 class="cname">${esc(r.name)}</h3>
+      <div class="seal">${esc(r.tier)}</div>
+    </div>
+    <div class="cmeta">
+      <span>${esc(r.zone)}</span><i class="dot"></i><span>${esc(CATICON[r.cat]||r.cat)}</span>
+      ${openBadge(r.sched)}
+      ${r.reserve?'<span class="rsvbadge">📅 จองได้</span>':''}
+      ${r.tag?`<span class="ctag">${esc(r.tag)}</span>`:''}
+    </div>
+    ${r.hours_disp?`<div class="chours">🕒 ${esc(r.hours_disp)}</div>`:''}
+    <p class="cwhy">${esc(r.why)}</p>
+    ${r.menu?`<div class="cmenu">${esc(r.menu)}</div>`:''}
+    <div class="cfoot">
+      <div class="cbudget">${esc(r.budget||'—')}<span>บาท/คน</span></div>
+      <div class="cacts">
+        ${(state.plan && favs.has(r.id) && maxDay>1) ? `<select class="daysel" data-dayset="${r.id}" title="ย้ายไปวันอื่น" onclick="event.stopPropagation()">${Array.from({length:maxDay},(_,i)=>i+1).map(d=>`<option value="${d}"${getDay(r.id)===d?' selected':''}>Day ${d}</option>`).join('')}</select>` : ''}
+        <button class="act fav${favs.has(r.id)?' on':''}" data-fav="${r.id}" title="เพิ่มในแผน" aria-label="เพิ่มในแผน">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="${favs.has(r.id)?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7.9 5.3-4.6-2.5-4.6 2.5.9-5.3L4.5 9.6l5.2-.7z"/></svg>
+        </button>
+        <button class="act chk${done.has(r.id)?' on':''}" data-done="${r.id}" title="ไปมาแล้ว" aria-label="ไปมาแล้ว">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>
+        </button>
+        <a class="act" href="${esc(r.map)}" target="_blank" rel="noopener" data-stop title="เปิด Google Maps" aria-label="เปิด Google Maps">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+        </a>
+        ${r.phone?`<a class="act" href="tel:${esc(r.phone.replace(/\s/g,''))}" data-stop title="โทร ${esc(r.phone)}" aria-label="โทรหาร้าน">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3.1-8.7A2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .3 2 .7 3a2 2 0 01-.4 2.1L8 10.3a16 16 0 006 6l1.5-1.4a2 2 0 012.1-.4c1 .4 2 .6 3 .7a2 2 0 011.7 2z"/></svg>
+        </a>`:''}
+      </div>
+    </div>
+  </article>`;
+}
+
+/* ---- route helpers ---- */
+function haversine(a,b){
+  const R=6371, toRad=x=>x*Math.PI/180;
+  const dLat=toRad(b.lat-a.lat), dLng=toRad(b.lng-a.lng);
+  const s=Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
+}
+function nearestNeighborOrder(items){
+  if(items.length<=1) return items.slice();
+  const pool = items.slice();
+  pool.sort((a,b)=>a.lng-b.lng);
+  const route = [pool.shift()];
+  while(pool.length){
+    const last = route[route.length-1];
+    let bi=0, bd=Infinity;
+    pool.forEach((p,i)=>{ const d=haversine(last,p); if(d<bd){bd=d;bi=i;} });
+    route.push(pool.splice(bi,1)[0]);
+  }
+  return route;
+}
+function gmapsDirUrl(items){
+  return 'https://www.google.com/maps/dir/' + items.map(r=>`${r.lat},${r.lng}`).join('/');
+}
+async function fetchOSRMRoute(ordered){
+  if(ordered.length<2) return null;
+  const coordStr = ordered.map(r=>`${r.lng},${r.lat}`).join(';');
+  const url = `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`;
+  try{
+    const res = await fetch(url);
+    if(!res.ok) return null;
+    const data = await res.json();
+    if(!data.routes || !data.routes[0]) return null;
+    const rt = data.routes[0];
+    return {
+      latlngs: rt.geometry.coordinates.map(([lng,lat])=>[lat,lng]),
+      km: rt.distance/1000,
+      min: rt.duration/60
+    };
+  }catch(e){ return null; }
+}
+
+/* ---- render ---- */
+function dayTabsHtml(){
+  const days = daysInUse();
+  let html = '<div class="daytabs">';
+  html += `<button class="daytab${state.activeDay==='all'?' on':''}" data-day="all">ทั้งหมด <span style="opacity:.6">${favs.size}</span></button>`;
+  days.forEach(d=>{
+    const cnt = [...favs].filter(id=>getDay(id)===d).length;
+    html += `<button class="daytab${state.activeDay===d?' on':''}" data-day="${d}">Day ${d} <span style="opacity:.6">${cnt}</span></button>`;
+  });
+  if(maxDay<7) html += `<button class="daytab add" data-day="add">+ เพิ่มวัน</button>`;
+  html += '</div>';
+  return html;
+}
+function render(){
+  const list = filtered();
+  $('#favCount').textContent = favs.size;
+  $('#favCount').hidden = favs.size===0;
+  $('#btnPlan').classList.toggle('on', state.plan);
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t.dataset.view===state.view));
+  $('#view').style.display = state.view==='map' ? 'none' : '';
+  $('#mapwrap').classList.toggle('on', state.view==='map');
+  $('#resCount').innerHTML = state.plan
+    ? `<b>${list.length}</b> ร้านในแผนของฉัน`
+    : `พบ <b>${list.length}</b> ร้าน${list.length!==DATA.length?` จากทั้งหมด ${DATA.length}`:''}`;
+
+  if(state.view==='map'){ renderMap(list); return; }
+
+  const view = $('#view');
+  if(!list.length){
+    view.innerHTML = (state.plan?dayTabsHtml():'') + `<div class="empty">
+      <h3>${state.plan?(state.activeDay!=='all'?`ยังไม่มีร้านใน Day ${state.activeDay}`:'ยังไม่มีร้านในแผน'):'ไม่เจอร้านที่ตรงเงื่อนไข'}</h3>
+      <p>${state.plan?'กดรูปดาวบนการ์ดร้านเพื่อเก็บไว้ในแผนวันนี้ หรือย้ายร้านจากวันอื่นมาที่นี่ผ่านเมนู Day บนการ์ด':'ลองลดเงื่อนไขลง หรือค้นด้วยคำที่สั้นกว่านี้'}</p>
+      ${state.plan?'':'<button id="btnEmptyClear">ล้างตัวกรอง</button>'}
+    </div>`;
+    const b = $('#btnEmptyClear'); if(b) b.onclick = clearAll;
+    return;
+  }
+
+  if(state.plan || state.sort==='zone'){
+    const groups = {};
+    list.forEach(r=>(groups[r.area] ||= []).push(r));
+    view.innerHTML = (state.plan?dayTabsHtml():'') + Object.entries(groups).map(([z,items])=>
+      `<div class="planzone"><h4>${esc(z)} · ${items.length} ร้าน</h4>
+       <div class="grid" style="padding-bottom:0">${items.map(card).join('')}</div></div>`
+    ).join('') + (state.plan?`<div style="padding:4px 0 40px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-s" id="btnCopy" style="width:auto;padding:10px 18px">คัดลอกแผนเป็นข้อความ</button><button class="btn btn-s" id="btnLine" style="width:auto;padding:10px 18px;color:#06C755;border-color:rgba(6,199,85,.4)">แชร์ไป LINE</button></div>`:'');
+    const c = $('#btnCopy'); if(c) c.onclick = ()=>copyPlan();
+    const ln = $('#btnLine'); if(ln) ln.onclick = ()=>shareLine();
+  } else if(state.sort==='tier'){
+    const groups = {};
+    list.forEach(r=>(groups[r.tier] ||= []).push(r));
+    view.innerHTML = TIERS.filter(t=>groups[t]).map(t=>
+      `<div class="planzone"><h4><span class="seal-mini" style="--tt:${TIERC[t]}">${t}</span>${esc(TIERLABEL[t])} · ${groups[t].length} ร้าน</h4>
+       <div class="grid" style="padding-bottom:0">${groups[t].map(card).join('')}</div></div>`
+    ).join('');
+  } else {
+    view.innerHTML = `<div class="grid">${list.map(card).join('')}</div>`;
+  }
+}
+
+/* ---- map view ---- */
+function ensureMap(){
+  if(map) return;
+  if(typeof L === 'undefined') throw new Error('leaflet-not-loaded');
+  map = L.map('leafmap', {zoomControl:true}).setView([18.7883,98.9853], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+  mapLayer = L.layerGroup().addTo(map);
+  routeLayer = L.layerGroup().addTo(map);
+  liveLayer = L.layerGroup().addTo(map);
+  previewLayer = L.layerGroup().addTo(map);
+}
+function renderMap(list){
+  $('#mapDayTabs').innerHTML = state.plan ? dayTabsHtml() : '';
+  try{ ensureMap(); }
+  catch(e){
+    $('#leafmap').innerHTML = `<div class="mapempty" style="padding-top:80px">โหลดแผนที่ไม่สำเร็จ (ต้องใช้อินเทอร์เน็ตเพื่อโหลด OpenStreetMap)<br>ลองรีเฟรชหน้านี้ใหม่อีกครั้ง</div>`;
+    $('#routePanel').innerHTML = '';
+    return;
+  }
+  setTimeout(()=>map.invalidateSize(), 60);
+  mapLayer.clearLayers();
+  routeLayer.clearLayers();
+
+  if(!list.length){
+    $('#routePanel').innerHTML = `<div class="mapempty">${state.plan?'ยังไม่มีร้านในแผน กดรูปดาวบนการ์ดร้านก่อน':'ไม่เจอร้านที่ตรงเงื่อนไข ลองลดตัวกรองลง'}</div>`;
+    return;
+  }
+
+  const bounds = [];
+  list.forEach(r=>{
+    const marker = L.circleMarker([r.lat,r.lng], {
+      radius: 8, color:'#12141a', weight:2, fillColor: TIERHEX[r.tier] || '#e2b04a',
+      fillOpacity: .95
+    }).addTo(mapLayer);
+    marker.bindPopup(`<div class="popname">${esc(r.name)}</div><div class="popmeta">${esc(r.zone)} · ${esc(r.tier)} · ${esc(r.budget||'-')} บ./คน</div><a class="poplink" href="${esc(r.map)}" target="_blank" rel="noopener">เปิด Google Maps →</a>`);
+    bounds.push([r.lat,r.lng]);
+  });
+  if(bounds.length) map.fitBounds(bounds, {padding:[30,30], maxZoom:15});
+
+  if(!state.plan){
+    $('#routePanel').innerHTML = `<div class="mapempty">หมุดสีคือระดับ Tier ของร้าน — กดรูปดาว ⭐ บนร้านที่สนใจแล้วสลับมาที่ "แผนของฉัน" เพื่อดูเส้นทางแนะนำ</div>`;
+    return;
+  }
+
+  // build per-zone routes for planned items
+  const groups = {};
+  list.forEach(r=>(groups[r.area] ||= []).push(r));
+  const palette = ['#e2b04a','#56a58a','#7fa3c9','#d9614a','#c98f2a'];
+  let gi = 0;
+  let panelHtml = '';
+  currentRoutes = {};
+
+  Object.entries(groups).forEach(([zone, items])=>{
+    const ordered = nearestNeighborOrder(items);
+    const color = palette[gi++ % palette.length];
+    const zoneKey = 'z'+gi;
+
+    // draw straight-line placeholder immediately
+    let line = null;
+    if(ordered.length>1){
+      line = L.polyline(ordered.map(r=>[r.lat,r.lng]), {color, weight:3, opacity:.75, dashArray:'6 6'}).addTo(routeLayer);
+    }
+    ordered.forEach((r,idx)=>{
+      L.marker([r.lat,r.lng], {
+        icon: L.divIcon({html:`<div class="pin-num" style="background:${color}">${idx+1}</div>`, className:'', iconSize:[22,22], iconAnchor:[11,11]})
+      }).addTo(routeLayer).bindPopup(`<div class="popname">${idx+1}. ${esc(r.name)}</div><div class="popmeta">${esc(r.menu||r.tag)}</div>`);
+    });
+
+    currentRoutes[zoneKey] = {ordered, color, latlngs: ordered.map(r=>[r.lat,r.lng])};
+
+    panelHtml += `<div class="routecard" data-zonekey="${zoneKey}">
+      <h5><span>${esc(zone)} · ${ordered.length} จุด</span><span class="routestat wait" id="stat-${zoneKey}">${ordered.length>1?'กำลังคำนวณระยะทางถนนจริง…':'จุดเดียว'}</span></h5>
+      <ul class="routelist">${ordered.map((r,idx)=>`<li><span class="rn">${idx+1}</span><div><div class="rname">${esc(r.name)}</div><div class="rmeta">${esc(r.menu||r.tag||'')}</div></div></li>`).join('')}</ul>
+      <div class="routebtnrow">
+        <a class="routebtn" href="${gmapsDirUrl(ordered)}" target="_blank" rel="noopener">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+          เปิดใน Google Maps
+        </a>
+        ${ordered.length>1?`<button class="previewbtn" data-preview="${zoneKey}" title="ดูรถวิ่งพรีวิวเส้นทาง">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>`:''}
+      </div>
+    </div>`;
+  });
+  $('#routePanel').innerHTML = panelHtml;
+  $('#routePanel').querySelectorAll('[data-preview]').forEach(b=>{
+    b.addEventListener('click', ()=> playRoutePreview(b.dataset.preview));
+  });
+
+  // fetch real road routes in background, replace straight lines when ready
+  Object.entries(currentRoutes).forEach(async ([zoneKey, rt])=>{
+    if(rt.ordered.length<2) return;
+    const osrm = await fetchOSRMRoute(rt.ordered);
+    const statEl = document.getElementById('stat-'+zoneKey);
+    if(!osrm){
+      if(statEl){ statEl.textContent = 'เส้นตรงโดยประมาณ (คำนวณถนนจริงไม่สำเร็จ)'; statEl.classList.add('wait'); }
+      return;
+    }
+    currentRoutes[zoneKey].latlngs = osrm.latlngs;
+    // redraw this zone's line as the real road path
+    routeLayer.eachLayer(l=>{
+      if(l instanceof L.Polyline && !(l instanceof L.CircleMarker) && l.options.color===rt.color){
+        routeLayer.removeLayer(l);
+      }
+    });
+    L.polyline(osrm.latlngs, {color: rt.color, weight:4, opacity:.85}).addTo(routeLayer);
+    if(statEl){
+      statEl.textContent = `🚗 ${osrm.km.toFixed(1)} กม. · ~${Math.round(osrm.min)} นาที`;
+      statEl.classList.remove('wait');
+    }
+  });
+}
+
+/* ---- route preview animation (simulated drive-through) ---- */
+function playRoutePreview(zoneKey){
+  const rt = currentRoutes[zoneKey];
+  if(!rt || rt.latlngs.length<2) return;
+  if(previewAnimId) cancelAnimationFrame(previewAnimId);
+  previewLayer.clearLayers();
+
+  const pts = rt.latlngs;
+  // build cumulative distance table for constant-speed interpolation
+  let total = 0;
+  const cum = [0];
+  for(let i=1;i<pts.length;i++){
+    total += haversine({lat:pts[i-1][0],lng:pts[i-1][1]}, {lat:pts[i][0],lng:pts[i][1]});
+    cum.push(total);
+  }
+  const carIcon = L.divIcon({
+    html:`<div style="width:16px;height:16px;border-radius:50%;background:${rt.color};border:2px solid #12141a;box-shadow:0 0 0 4px ${rt.color}33"></div>`,
+    className:'', iconSize:[16,16], iconAnchor:[8,8]
+  });
+  const car = L.marker(pts[0], {icon: carIcon}).addTo(previewLayer);
+  const durationMs = Math.min(6000, Math.max(2200, pts.length*180));
+  const t0 = performance.now();
+
+  function frame(now){
+    const p = Math.min(1, (now-t0)/durationMs);
+    const target = p*total;
+    let i=0; while(i<cum.length-1 && cum[i+1]<target) i++;
+    const segLen = cum[i+1]-cum[i] || 1;
+    const segP = (target-cum[i])/segLen;
+    const lat = pts[i][0] + (pts[i+1] ? (pts[i+1][0]-pts[i][0])*segP : 0);
+    const lng = pts[i][1] + (pts[i+1] ? (pts[i+1][1]-pts[i][1])*segP : 0);
+    car.setLatLng([lat,lng]);
+    if(p<1){ previewAnimId = requestAnimationFrame(frame); }
+    else { setTimeout(()=>previewLayer.removeLayer(car), 500); }
+  }
+  previewAnimId = requestAnimationFrame(frame);
+}
+
+/* ---- live location tracking ---- */
+function toggleLiveLoc(){
+  if(liveWatchId!==null){
+    navigator.geolocation.clearWatch(liveWatchId);
+    liveWatchId = null;
+    if(liveMarker){ liveLayer.removeLayer(liveMarker); liveMarker=null; }
+    $('#btnLiveLoc').classList.remove('on');
+    $('#liveLocLabel').textContent = 'ติดตามตำแหน่งฉันสด';
+    return;
+  }
+  if(!navigator.geolocation){ return toast('เบราว์เซอร์นี้ไม่รองรับการหาตำแหน่ง'); }
+  ensureMap();
+  $('#liveLocLabel').textContent = 'กำลังเชื่อมตำแหน่ง…';
+  liveWatchId = navigator.geolocation.watchPosition(
+    pos=>{
+      const ll = [pos.coords.latitude, pos.coords.longitude];
+      if(!liveMarker){
+        liveMarker = L.marker(ll, {
+          icon: L.divIcon({html:`<div style="width:18px;height:18px;border-radius:50%;background:#4a9eff;border:3px solid #fff;box-shadow:0 0 0 6px rgba(74,158,255,.3)"></div>`, className:'', iconSize:[18,18], iconAnchor:[9,9]})
+        }).addTo(liveLayer).bindPopup('ตำแหน่งฉันตอนนี้');
+        map.panTo(ll);
+      } else {
+        liveMarker.setLatLng(ll);
+      }
+      $('#btnLiveLoc').classList.add('on');
+      $('#liveLocLabel').textContent = 'กำลังติดตามตำแหน่งฉันสด';
+    },
+    ()=>{
+      toast('ขอตำแหน่งไม่สำเร็จ ลองอนุญาตการเข้าถึงตำแหน่งอีกครั้ง');
+      $('#liveLocLabel').textContent = 'ติดตามตำแหน่งฉันสด';
+      liveWatchId = null;
+    },
+    {enableHighAccuracy:true, maximumAge:5000}
+  );
+}
+
+/* ---- detail sheet ---- */
+function openSheet(r){
+  const row = (k,v,cls='')=> v? `<div class="srow"><dt>${k}</dt><dd class="${cls}">${esc(v)}</dd></div>` : '';
+  $('#sheet').innerHTML = `
+    <div class="shead">
+      <div class="shandle"></div>
+      <div class="stitle">
+        <div>
+          <h2>${esc(r.name)}</h2>
+          <div class="cmeta" style="margin:0">
+            <span>${esc(r.zone)}</span><i class="dot"></i><span>${esc(CATICON[r.cat]||r.cat)}</span>
+            ${openBadge(r.sched)}
+            ${r.tag?`<span class="ctag">${esc(r.tag)}</span>`:''}
+          </div>
+        </div>
+        <div class="seal" style="--tier:${TIERC[r.tier]};width:44px;height:44px;font-size:15px">${esc(r.tier)}</div>
+      </div>
+    </div>
+    <div class="sbody">
+      <dl style="margin:0">
+        ${row('ทำไมต้องไป', r.why)}
+        ${row('เมนูห้ามพลาด', r.menu,'hl')}
+        ${row('งบต่อคน', r.budget? r.budget+' บาท':'')}
+        ${row('เวลาเปิด', r.hours_disp || r.hours)}
+        ${row('วันหยุด', r.hours_disp ? '' : r.closed)}
+        ${row('ที่จอดรถ', r.parking)}
+        ${row('การจอง', r.reserve? '📅 แนะนำให้จองล่วงหน้า' : '')}
+        ${r.phone? `<div class="srow"><dt>เบอร์โทร</dt><dd><a href="tel:${esc(r.phone.replace(/\s/g,''))}" style="color:var(--jade);font-weight:600">${esc(r.phone)}</a></dd></div>` : ''}
+        ${row('ข้อควรรู้', r.note)}
+        ${row('ตรวจล่าสุด', r.checked)}
+        ${r.approx? row('พิกัดแผนที่','เป็นตำแหน่งโดยประมาณ (ยังไม่ยืนยันพิกัดร้านจริง)') : ''}
+      </dl>
+    </div>
+    <div class="sbtns">
+      <a class="btn btn-p" href="${esc(r.map)}" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+        เปิดใน Google Maps
+      </a>
+      <button class="btn btn-s${favs.has(r.id)?' on':''}" id="sheetFav">${favs.has(r.id)?'อยู่ในแผนแล้ว':'เก็บใส่แผน'}</button>
+    </div>
+    ${r.src?`<div style="padding:14px 20px 0;font-size:11.5px;color:var(--dimmer)">แหล่งข้อมูล: <a href="${esc(r.src)}" target="_blank" rel="noopener" style="color:var(--dim)">${esc(r.src.replace(/^https?:\/\//,'').slice(0,46))}…</a></div>`:''}
+  `;
+  $('#scrim').classList.add('open');
+  document.body.style.overflow='hidden';
+  $('#sheetFav').onclick = ()=>{ toggleFav(r.id); openSheet(r); };
+}
+function closeSheet(){ $('#scrim').classList.remove('open'); document.body.style.overflow=''; }
+
+/* ---- actions ---- */
+let toastT;
+function toast(msg){
+  const t=$('#toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1900);
+}
+function toggleFav(id){
+  if(favs.has(id)){
+    favs.delete(id);
+    delete favDays[id];
+    saveFavDays();
+  } else {
+    favs.add(id);
+    favDays[id] = (state.plan && state.activeDay!=='all') ? state.activeDay : 1;
+    saveFavDays();
+  }
+  saveFavs(); render();
+  toast(favs.has(id)?`เก็บใส่แผน Day ${getDay(id)} แล้ว`:'เอาออกจากแผนแล้ว');
+}
+function toggleDone(id){
+  done.has(id)? done.delete(id) : done.add(id);
+  saveDone(); render();
+  toast(done.has(id)?'ทำเครื่องหมายว่าไปมาแล้ว':'ยกเลิกเครื่องหมายไปมาแล้ว');
+}
+function buildPlanText(){
+  const byId = Object.fromEntries(DATA.map(r=>[r.id,r]));
+  const days = daysInUse().filter(d=>[...favs].some(id=>getDay(id)===d));
+  const dayList = days.length? days : [1];
+  let out = 'แผนกินเชียงใหม่\n';
+  dayList.forEach(d=>{
+    const ids = [...favs].filter(id=>getDay(id)===d);
+    if(!ids.length) return;
+    out += `\n━━ Day ${d} ━━\n`;
+    const groups = {};
+    ids.forEach(id=>{ const r=byId[id]; (groups[r.area] ||= []).push(r); });
+    Object.entries(groups).forEach(([z,items])=>{
+      out += `【${z}】\n` + items.map(r=>`• ${r.name} — ${r.menu||r.tag} (${r.budget} บ.)\n  ${r.map}`).join('\n') + '\n';
+    });
+  });
+  return out.trim();
+}
+function copyPlan(){
+  const txt = buildPlanText();
+  navigator.clipboard?.writeText(txt).then(()=>toast('คัดลอกแผนแล้ว วางในแชทได้เลย'))
+    .catch(()=>toast('คัดลอกไม่สำเร็จ ลองใหม่อีกครั้ง'));
+}
+function shareLine(){
+  const txt = buildPlanText();
+  const url = 'line://msg/text/' + encodeURIComponent(txt);
+  let hidden = false;
+  const onHide = ()=>{ if(document.hidden) hidden = true; };
+  document.addEventListener('visibilitychange', onHide);
+  window.location.href = url;
+  setTimeout(()=>{
+    document.removeEventListener('visibilitychange', onHide);
+    if(!hidden){
+      window.open('https://social-plugins.line.me/lineit/share?text='+encodeURIComponent(txt), '_blank');
+    }
+  }, 900);
+}
+function clearAll(){
+  state.q=''; state.cat='ALL'; state.tiers.clear(); state.area='ALL'; state.budget=99999; state.plan=false;
+  state.openNow=false; state.near=false; state.reserveOnly=false;
+  $('#q').value=''; $('#areaSel').value='ALL';
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.cat==='ALL'));
+  document.querySelectorAll('#tierPills .pill').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('#budgetPills .pill').forEach(p=>p.classList.toggle('on',p.dataset.budget==='99999'));
+  $('#pillOpenNow').classList.remove('on');
+  $('#pillReserve').classList.remove('on');
+  $('#pillNearMe').classList.remove('on');
+  render();
+}
+
+/* ---- events ---- */
+$('#q').addEventListener('input', e=>{ state.q=e.target.value.trim(); render(); });
+$('#catChips').addEventListener('click', e=>{
+  const c = e.target.closest('.chip'); if(!c) return;
+  state.cat = c.dataset.cat;
+  document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c));
+  render();
+});
+$('#tierPills').addEventListener('click', e=>{
+  const p = e.target.closest('.pill'); if(!p) return;
+  const t = p.dataset.tier;
+  state.tiers.has(t)? state.tiers.delete(t) : state.tiers.add(t);
+  p.classList.toggle('on'); render();
+});
+$('#areaSel').addEventListener('change', e=>{ state.area=e.target.value; render(); });
+$('#budgetPills').addEventListener('click', e=>{
+  const p = e.target.closest('.pill'); if(!p) return;
+  state.budget = +p.dataset.budget;
+  document.querySelectorAll('#budgetPills .pill').forEach(x=>x.classList.toggle('on',x===p));
+  render();
+});
+$('#sortSel').addEventListener('change', e=>{ state.sort=e.target.value; render(); });
+$('#btnFilter').addEventListener('click', ()=>{
+  const f=$('#filters'); f.classList.toggle('open'); $('#btnFilter').classList.toggle('on',f.classList.contains('open'));
+});
+$('#btnPlan').addEventListener('click', ()=>{ state.plan=!state.plan; render(); window.scrollTo({top:0,behavior:'smooth'}); });
+$('#viewTabs').addEventListener('click', e=>{
+  const t = e.target.closest('.tab'); if(!t) return;
+  state.view = t.dataset.view; render();
+});
+$('#btnLiveLoc').addEventListener('click', toggleLiveLoc);
+$('#pillOpenNow').addEventListener('click', ()=>{
+  state.openNow = !state.openNow;
+  $('#pillOpenNow').classList.toggle('on', state.openNow);
+  render();
+});
+$('#pillReserve').addEventListener('click', ()=>{
+  state.reserveOnly = !state.reserveOnly;
+  $('#pillReserve').classList.toggle('on', state.reserveOnly);
+  render();
+});
+$('#pillNearMe').addEventListener('click', ()=>{
+  if(state.near){ state.near=false; $('#pillNearMe').classList.remove('on'); render(); return; }
+  if(userLoc){ state.near=true; $('#pillNearMe').classList.add('on'); render(); return; }
+  if(!navigator.geolocation){ return toast('เบราว์เซอร์นี้ไม่รองรับการหาตำแหน่ง'); }
+  $('#pillNearMe').textContent = '📍 กำลังหาตำแหน่ง…';
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      userLoc = {lat:pos.coords.latitude, lng:pos.coords.longitude};
+      state.near = true;
+      $('#pillNearMe').textContent = '📍 ใกล้ฉัน';
+      $('#pillNearMe').classList.add('on');
+      render();
+      toast('เรียงตามระยะใกล้ฉันแล้ว');
+    },
+    ()=>{
+      $('#pillNearMe').textContent = '📍 ใกล้ฉัน';
+      toast('ขอตำแหน่งไม่สำเร็จ ลองอนุญาตการเข้าถึงตำแหน่งอีกครั้ง');
+    }
+  );
+});
+$('#btnClear').addEventListener('click', clearAll);
+$('#btnRandom').addEventListener('click', ()=>{
+  const list = filtered();
+  if(!list.length) return toast('ไม่มีร้านให้สุ่ม ลองลดเงื่อนไขลง');
+  openSheet(list[Math.floor(Math.random()*list.length)]);
+});
+document.addEventListener('click', e=>{
+  if(e.target.closest('[data-stop]')) { e.stopPropagation(); return; }
+  const fav = e.target.closest('[data-fav]');
+  if(fav){ e.stopPropagation(); return toggleFav(+fav.dataset.fav); }
+  const dn = e.target.closest('[data-done]');
+  if(dn){ e.stopPropagation(); return toggleDone(+dn.dataset.done); }
+  const dt = e.target.closest('[data-day]');
+  if(dt){
+    e.stopPropagation();
+    const v = dt.dataset.day;
+    if(v==='add') return addDay();
+    state.activeDay = v==='all' ? 'all' : parseInt(v,10);
+    return render();
+  }
+  const c = e.target.closest('.card');
+  if(c) return openSheet(DATA[+c.dataset.id]);
+});
+document.addEventListener('change', e=>{
+  const ds = e.target.closest('[data-dayset]');
+  if(ds){ setDay(+ds.dataset.dayset, parseInt(ds.value,10)); }
+});
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') closeSheet();
+  if(e.key==='Enter'){ const c=document.activeElement.closest?.('.card'); if(c && document.activeElement===c) openSheet(DATA[+c.dataset.id]); }
+  if(e.key==='/' && document.activeElement!==$('#q')){ e.preventDefault(); $('#q').focus(); }
+});
+$('#scrim').addEventListener('click', e=>{ if(e.target===$('#scrim')) closeSheet(); });
+
+render();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{ /* file:// or unsupported host — silently skip */ });
+  });
+}
+</script>
+</body>
+</html>
