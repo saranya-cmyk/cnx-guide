@@ -1,6 +1,6 @@
-const CACHE_NAME = 'cm-food-guide-v1';
+const CACHE_NAME = 'cm-food-guide-v2';
 const APP_SHELL = [
-  './chiangmai-food-guide.html',
+  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'

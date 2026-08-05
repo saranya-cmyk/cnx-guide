@@ -2,7 +2,7 @@
   "name": "CNX — คู่มือร้านเชียงใหม่ 2026",
   "short_name": "CNX",
   "description": "คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ คัดตามเหตุผลที่ควรไปจริง",
-  "start_url": "./chiangmai-food-guide.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
