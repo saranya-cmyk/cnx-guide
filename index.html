@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CNX">
-<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ 121 ร้าน คัดตามเหตุผลที่ควรไปจริง">
+<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ 120 ร้าน คัดตามเหตุผลที่ควรไปจริง">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Trirong:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
@@ -160,6 +160,25 @@ select.sel{
 .card:hover{transform:translateY(-3px);border-color:var(--dimmer);background:var(--surface2)}
 .card:hover::before{opacity:1}
 .card.done{opacity:.5}
+.card.selected{border-color:var(--gold);background:rgba(226,176,74,.09)}
+.card.selected::before{opacity:1}
+.bulkcheck{
+  position:absolute;top:14px;right:14px;width:24px;height:24px;border-radius:50%;
+  border:2px solid var(--dimmer);background:var(--bg);display:flex;align-items:center;justify-content:center;
+  color:#12141a;z-index:2;
+}
+.card.selected .bulkcheck{background:var(--gold);border-color:var(--gold)}
+.bulkbar{
+  position:sticky;bottom:12px;z-index:30;background:var(--surface);border:1px solid var(--gold);
+  border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;margin-top:14px;box-shadow:var(--shadow);flex-wrap:wrap;
+}
+.bulkbar .cnt{font-size:13.5px;color:var(--ink)}
+.bulkbar .cnt b{font-family:'Chakra Petch',sans-serif;color:var(--gold)}
+.bulkbar .bbtns{display:flex;gap:8px}
+.bulkbtn{padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600}
+.bulkbtn.danger{background:var(--chili);color:#fff}
+.bulkbtn.ghost{background:var(--surface2);border:1px solid var(--line);color:var(--dim)}
 .chead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:3px}
 .cname{font-family:'Trirong',serif;font-weight:600;font-size:19px;line-height:1.28;margin:0;letter-spacing:-.005em}
 .seal{
@@ -530,7 +549,8 @@ const CATICON = {
   'Street Food & Local':'สตรีทฟู้ด','อาหารตามสั่ง':'ตามสั่ง','Bar & Cocktail':'บาร์/ค็อกเทล'
 };
 
-const state = { q:'', cat:'ALL', tiers:new Set(), area:'ALL', budget:99999, sort:'tier', plan:false, view:'grid', openNow:false, near:false, reserveOnly:false, activeDay:'all' };
+const state = { q:'', cat:'ALL', tiers:new Set(), area:'ALL', budget:99999, sort:'tier', plan:false, view:'grid', openNow:false, near:false, reserveOnly:false, activeDay:'all', bulkEdit:false };
+let bulkSelected = new Set();
 let userLoc = null;
 
 /* ---- Bangkok time & open-now logic ---- */
@@ -659,7 +679,10 @@ function openBadge(sched){
   return `<span class="openbadge closed"><span class="dotlive"></span>ปิดแล้ว</span>`;
 }
 function card(r){
-  return `<article class="card${done.has(r.id)?' done':''}" data-id="${r.id}" style="--tier:${TIERC[r.tier]}" tabindex="0" role="button">
+  const bulk = state.plan && state.bulkEdit;
+  const sel = bulk && bulkSelected.has(r.id);
+  return `<article class="card${done.has(r.id)?' done':''}${sel?' selected':''}" data-id="${r.id}" style="--tier:${TIERC[r.tier]}" tabindex="0" role="button">
+    ${bulk?`<div class="bulkcheck">${sel?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>':''}</div>`:''}
     <div class="chead">
       <h3 class="cname">${esc(r.name)}</h3>
       <div class="seal">${esc(r.tier)}</div>
@@ -675,7 +698,7 @@ function card(r){
     ${r.menu?`<div class="cmenu">${esc(r.menu)}</div>`:''}
     <div class="cfoot">
       <div class="cbudget">${esc(r.budget||'—')}<span>บาท/คน</span></div>
-      <div class="cacts">
+      <div class="cacts"${bulk?' style="display:none"':''}>
         ${(state.plan && favs.has(r.id) && maxDay>1) ? `<select class="daysel" data-dayset="${r.id}" title="ย้ายไปวันอื่น" onclick="event.stopPropagation()">${Array.from({length:maxDay},(_,i)=>i+1).map(d=>`<option value="${d}"${getDay(r.id)===d?' selected':''}>Day ${d}</option>`).join('')}</select>` : ''}
         <button class="act fav${favs.has(r.id)?' on':''}" data-fav="${r.id}" title="เพิ่มในแผน" aria-label="เพิ่มในแผน">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="${favs.has(r.id)?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7.9 5.3-4.6-2.5-4.6 2.5.9-5.3L4.5 9.6l5.2-.7z"/></svg>
@@ -776,12 +799,40 @@ function render(){
   if(state.plan || state.sort==='zone'){
     const groups = {};
     list.forEach(r=>(groups[r.area] ||= []).push(r));
+    const bulkBtn = state.plan ? `<button class="btn btn-s" id="btnBulk" style="width:auto;padding:10px 18px${state.bulkEdit?';border-color:var(--gold);color:var(--gold)':''}">${state.bulkEdit?'ยกเลิกการเลือก':'เลือกเพื่อลบหลายร้าน'}</button>` : '';
     view.innerHTML = (state.plan?dayTabsHtml():'') + Object.entries(groups).map(([z,items])=>
       `<div class="planzone"><h4>${esc(z)} · ${items.length} ร้าน</h4>
        <div class="grid" style="padding-bottom:0">${items.map(card).join('')}</div></div>`
-    ).join('') + (state.plan?`<div style="padding:4px 0 40px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-s" id="btnCopy" style="width:auto;padding:10px 18px">คัดลอกแผนเป็นข้อความ</button><button class="btn btn-s" id="btnLine" style="width:auto;padding:10px 18px;color:#06C755;border-color:rgba(6,199,85,.4)">แชร์ไป LINE</button></div>`:'');
+    ).join('') + (state.plan?`<div style="padding:4px 0 40px;display:flex;gap:8px;flex-wrap:wrap">${bulkBtn}<button class="btn btn-s" id="btnCopy" style="width:auto;padding:10px 18px">คัดลอกแผนเป็นข้อความ</button><button class="btn btn-s" id="btnLine" style="width:auto;padding:10px 18px;color:#06C755;border-color:rgba(6,199,85,.4)">แชร์ไป LINE</button></div>`:'');
     const c = $('#btnCopy'); if(c) c.onclick = ()=>copyPlan();
     const ln = $('#btnLine'); if(ln) ln.onclick = ()=>shareLine();
+    const bb = $('#btnBulk'); if(bb) bb.onclick = ()=>{ state.bulkEdit=!state.bulkEdit; bulkSelected.clear(); render(); };
+    if(state.bulkEdit){
+      const bar = document.createElement('div');
+      bar.className = 'bulkbar';
+      bar.innerHTML = `<span class="cnt">เลือกแล้ว <b>${bulkSelected.size}</b> ร้าน</span>
+        <div class="bbtns">
+          <button class="bulkbtn ghost" id="btnSelAll">เลือกทั้งหมด</button>
+          <button class="bulkbtn danger" id="btnBulkDel" ${bulkSelected.size?'':'disabled style="opacity:.4"'}>ลบที่เลือก</button>
+        </div>`;
+      view.appendChild(bar);
+      $('#btnSelAll').onclick = ()=>{
+        const allIds = list.map(r=>r.id);
+        if(allIds.every(id=>bulkSelected.has(id))) allIds.forEach(id=>bulkSelected.delete(id));
+        else allIds.forEach(id=>bulkSelected.add(id));
+        render();
+      };
+      const del = $('#btnBulkDel');
+      if(del) del.onclick = ()=>{
+        if(!bulkSelected.size) return;
+        const n = bulkSelected.size;
+        bulkSelected.forEach(id=>{ favs.delete(id); delete favDays[id]; });
+        saveFavs(); saveFavDays();
+        bulkSelected.clear(); state.bulkEdit=false;
+        render();
+        toast(`เอาออกจากแผน ${n} ร้านแล้ว`);
+      };
+    }
   } else if(state.sort==='tier'){
     const groups = {};
     list.forEach(r=>(groups[r.tier] ||= []).push(r));
@@ -1129,7 +1180,7 @@ $('#sortSel').addEventListener('change', e=>{ state.sort=e.target.value; render(
 $('#btnFilter').addEventListener('click', ()=>{
   const f=$('#filters'); f.classList.toggle('open'); $('#btnFilter').classList.toggle('on',f.classList.contains('open'));
 });
-$('#btnPlan').addEventListener('click', ()=>{ state.plan=!state.plan; render(); window.scrollTo({top:0,behavior:'smooth'}); });
+$('#btnPlan').addEventListener('click', ()=>{ state.plan=!state.plan; state.bulkEdit=false; bulkSelected.clear(); render(); window.scrollTo({top:0,behavior:'smooth'}); });
 $('#viewTabs').addEventListener('click', e=>{
   const t = e.target.closest('.tab'); if(!t) return;
   state.view = t.dataset.view; render();
@@ -1186,7 +1237,14 @@ document.addEventListener('click', e=>{
     return render();
   }
   const c = e.target.closest('.card');
-  if(c) return openSheet(DATA[+c.dataset.id]);
+  if(c){
+    const id = +c.dataset.id;
+    if(state.plan && state.bulkEdit){
+      bulkSelected.has(id) ? bulkSelected.delete(id) : bulkSelected.add(id);
+      return render();
+    }
+    return openSheet(DATA[id]);
+  }
 });
 document.addEventListener('change', e=>{
   const ds = e.target.closest('[data-dayset]');
