@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CNX">
-<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ 142 ร้าน คัดตามเหตุผลที่ควรไปจริง">
+<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ 120 ร้าน คัดตามเหตุผลที่ควรไปจริง">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Trirong:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
@@ -653,6 +653,16 @@ $('#budgetPills').innerHTML = BUDGETS.map(([v,l])=>`<button class="pill${v===999
 rebuildForProvince();
 
 /* ---- filtering ---- */
+// Full plan for the active day, ignoring category/tier/budget/search filters —
+// used for "open whole set" actions so they always export everything you've
+// saved, not just whatever category chip happens to be selected on screen.
+function planItemsForDay(){
+  return DATA.filter(r=>{
+    if(!favs.has(r.id)) return false;
+    if(state.activeDay!=='all' && getDay(r.id)!==state.activeDay) return false;
+    return true;
+  });
+}
 function filtered(){
   let out = DATA.filter(r=>{
     if(!state.plan && r.prov!==state.province) return false;
@@ -853,7 +863,7 @@ function render(){
     const groups = {};
     list.forEach(r=>(groups[r.area] ||= []).push(r));
     const bulkBtn = state.plan ? `<button class="btn btn-s" id="btnBulk" style="width:auto;padding:10px 18px${state.bulkEdit?';border-color:var(--gold);color:var(--gold)':''}">${state.bulkEdit?'ยกเลิกการเลือก':'เลือกเพื่อลบหลายร้าน'}</button>` : '';
-    const gmapsAllBtn = state.plan ? `<button class="btn btn-p" id="btnGmapsAll" style="width:100%;flex:1 1 100%;padding:12px 18px;margin-bottom:2px">📍 เปิดชุดนี้ใน Google Maps (${list.length} ร้าน)</button>` : '';
+    const gmapsAllBtn = state.plan ? `<button class="btn btn-p" id="btnGmapsAll" style="width:100%;flex:1 1 100%;padding:12px 18px;margin-bottom:2px">📍 เปิดชุดนี้ใน Google Maps (${planItemsForDay().length} ร้าน)</button>` : '';
     view.innerHTML = (state.plan?dayTabsHtml():'') + Object.entries(groups).map(([z,items])=>
       `<div class="planzone"><h4>${esc(z)} · ${items.length} ร้าน</h4>
        <div class="grid" style="padding-bottom:0">${items.map(card).join('')}</div></div>`
@@ -861,11 +871,12 @@ function render(){
     const c = $('#btnCopy'); if(c) c.onclick = ()=>copyPlan();
     const ln = $('#btnLine'); if(ln) ln.onclick = ()=>shareLine();
     const ga = $('#btnGmapsAll'); if(ga) ga.onclick = ()=>{
-      if(list.length<1) return;
-      if(list.length>10){
-        toast(`Google Maps รองรับได้สูงสุด ~10 จุดต่อเส้นทาง (ตอนนี้เลือกไว้ ${list.length} ร้าน) จะเปิด 10 ร้านแรกตามลำดับ S+ ก่อน`);
+      const full = planItemsForDay();
+      if(full.length<1) return;
+      if(full.length>10){
+        toast(`Google Maps รองรับได้สูงสุด ~10 จุดต่อเส้นทาง (ตอนนี้เลือกไว้ ${full.length} ร้าน) จะเปิด 10 ร้านแรกตามลำดับ S+ ก่อน`);
       }
-      const capped = list.slice(0,10);
+      const capped = full.slice(0,10);
       const ordered = bestOrder(capped);
       window.open(gmapsDirUrl(ordered), '_blank');
     };
