@@ -1209,19 +1209,26 @@ $('#catChips').addEventListener('click', e=>{
   document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c));
   render();
 });
+function closeFiltersAndShow(){
+  $('#filters').classList.remove('open');
+  $('#btnFilter').classList.remove('on');
+  $('#resCount')?.scrollIntoView({behavior:'smooth', block:'start'});
+}
 $('#tierPills').addEventListener('click', e=>{
   const p = e.target.closest('.pill'); if(!p) return;
   const t = p.dataset.tier;
   state.tiers.has(t)? state.tiers.delete(t) : state.tiers.add(t);
   p.classList.toggle('on'); render();
+  closeFiltersAndShow();
 });
-$('#areaSel').addEventListener('change', e=>{ state.area=e.target.value; render(); });
-$('#daySel').addEventListener('change', e=>{ state.dayFilter=e.target.value; render(); });
+$('#areaSel').addEventListener('change', e=>{ state.area=e.target.value; render(); closeFiltersAndShow(); });
+$('#daySel').addEventListener('change', e=>{ state.dayFilter=e.target.value; render(); closeFiltersAndShow(); });
 $('#budgetPills').addEventListener('click', e=>{
   const p = e.target.closest('.pill'); if(!p) return;
   state.budget = +p.dataset.budget;
   document.querySelectorAll('#budgetPills .pill').forEach(x=>x.classList.toggle('on',x===p));
   render();
+  closeFiltersAndShow();
 });
 $('#sortSel').addEventListener('change', e=>{ state.sort=e.target.value; render(); });
 $('#btnFilter').addEventListener('click', ()=>{
@@ -1248,15 +1255,17 @@ $('#pillOpenNow').addEventListener('click', ()=>{
   state.openNow = !state.openNow;
   $('#pillOpenNow').classList.toggle('on', state.openNow);
   render();
+  closeFiltersAndShow();
 });
 $('#pillReserve').addEventListener('click', ()=>{
   state.reserveOnly = !state.reserveOnly;
   $('#pillReserve').classList.toggle('on', state.reserveOnly);
   render();
+  closeFiltersAndShow();
 });
 $('#pillNearMe').addEventListener('click', ()=>{
-  if(state.near){ state.near=false; $('#pillNearMe').classList.remove('on'); render(); return; }
-  if(userLoc){ state.near=true; $('#pillNearMe').classList.add('on'); render(); return; }
+  if(state.near){ state.near=false; $('#pillNearMe').classList.remove('on'); render(); closeFiltersAndShow(); return; }
+  if(userLoc){ state.near=true; $('#pillNearMe').classList.add('on'); render(); closeFiltersAndShow(); return; }
   if(!navigator.geolocation){ return toast('เบราว์เซอร์นี้ไม่รองรับการหาตำแหน่ง'); }
   $('#pillNearMe').textContent = '📍 กำลังหาตำแหน่ง…';
   navigator.geolocation.getCurrentPosition(
@@ -1266,6 +1275,7 @@ $('#pillNearMe').addEventListener('click', ()=>{
       $('#pillNearMe').textContent = '📍 ใกล้ฉัน';
       $('#pillNearMe').classList.add('on');
       render();
+      closeFiltersAndShow();
       toast('เรียงตามระยะใกล้ฉันแล้ว');
     },
     ()=>{
