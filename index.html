@@ -846,12 +846,22 @@ function render(){
     const groups = {};
     list.forEach(r=>(groups[r.area] ||= []).push(r));
     const bulkBtn = state.plan ? `<button class="btn btn-s" id="btnBulk" style="width:auto;padding:10px 18px${state.bulkEdit?';border-color:var(--gold);color:var(--gold)':''}">${state.bulkEdit?'ยกเลิกการเลือก':'เลือกเพื่อลบหลายร้าน'}</button>` : '';
+    const gmapsAllBtn = state.plan ? `<button class="btn btn-p" id="btnGmapsAll" style="width:100%;flex:1 1 100%;padding:12px 18px;margin-bottom:2px">📍 เปิดชุดนี้ใน Google Maps (${list.length} ร้าน)</button>` : '';
     view.innerHTML = (state.plan?dayTabsHtml():'') + Object.entries(groups).map(([z,items])=>
       `<div class="planzone"><h4>${esc(z)} · ${items.length} ร้าน</h4>
        <div class="grid" style="padding-bottom:0">${items.map(card).join('')}</div></div>`
-    ).join('') + (state.plan?`<div style="padding:4px 0 40px;display:flex;gap:8px;flex-wrap:wrap">${bulkBtn}<button class="btn btn-s" id="btnCopy" style="width:auto;padding:10px 18px">คัดลอกแผนเป็นข้อความ</button><button class="btn btn-s" id="btnLine" style="width:auto;padding:10px 18px;color:#06C755;border-color:rgba(6,199,85,.4)">แชร์ไป LINE</button></div>`:'');
+    ).join('') + (state.plan?`<div style="padding:4px 0 40px;display:flex;gap:8px;flex-wrap:wrap">${gmapsAllBtn}${bulkBtn}<button class="btn btn-s" id="btnCopy" style="width:auto;padding:10px 18px">คัดลอกแผนเป็นข้อความ</button><button class="btn btn-s" id="btnLine" style="width:auto;padding:10px 18px;color:#06C755;border-color:rgba(6,199,85,.4)">แชร์ไป LINE</button></div>`:'');
     const c = $('#btnCopy'); if(c) c.onclick = ()=>copyPlan();
     const ln = $('#btnLine'); if(ln) ln.onclick = ()=>shareLine();
+    const ga = $('#btnGmapsAll'); if(ga) ga.onclick = ()=>{
+      if(list.length<1) return;
+      if(list.length>10){
+        toast(`Google Maps รองรับได้สูงสุด ~10 จุดต่อเส้นทาง (ตอนนี้เลือกไว้ ${list.length} ร้าน) จะเปิด 10 ร้านแรกตามลำดับ S+ ก่อน`);
+      }
+      const capped = list.slice(0,10);
+      const ordered = nearestNeighborOrder(capped);
+      window.open(gmapsDirUrl(ordered), '_blank');
+    };
     const bb = $('#btnBulk'); if(bb) bb.onclick = ()=>{ state.bulkEdit=!state.bulkEdit; bulkSelected.clear(); render(); };
     if(state.bulkEdit){
       const bar = document.createElement('div');
