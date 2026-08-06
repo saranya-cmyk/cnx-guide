@@ -801,7 +801,15 @@ function bestOrder(items){
   return best.map(i=>items[i]);
 }
 function gmapsDirUrl(items){
-  return 'https://www.google.com/maps/dir/' + items.map(r=>`${r.lat},${r.lng}`).join('/');
+  // Uses dir_action=navigate so Google Maps jumps straight into turn-by-turn
+  // navigation from the current location, instead of showing a route preview.
+  if(items.length===1){
+    const r = items[0];
+    return `https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}&travelmode=driving&dir_action=navigate`;
+  }
+  const dest = items[items.length-1];
+  const waypoints = items.slice(0,-1).map(r=>`${r.lat},${r.lng}`).join('|');
+  return `https://www.google.com/maps/dir/?api=1&destination=${dest.lat},${dest.lng}&waypoints=${encodeURIComponent(waypoints)}&travelmode=driving&dir_action=navigate`;
 }
 async function fetchOSRMRoute(ordered){
   if(ordered.length<2) return null;
@@ -863,7 +871,7 @@ function render(){
     const groups = {};
     list.forEach(r=>(groups[r.area] ||= []).push(r));
     const bulkBtn = state.plan ? `<button class="btn btn-s" id="btnBulk" style="width:auto;padding:10px 18px${state.bulkEdit?';border-color:var(--gold);color:var(--gold)':''}">${state.bulkEdit?'ยกเลิกการเลือก':'เลือกเพื่อลบหลายร้าน'}</button>` : '';
-    const gmapsAllBtn = state.plan ? `<button class="btn btn-p" id="btnGmapsAll" style="width:100%;flex:1 1 100%;padding:12px 18px;margin-bottom:2px">📍 เปิดชุดนี้ใน Google Maps (${planItemsForDay().length} ร้าน)</button>` : '';
+    const gmapsAllBtn = state.plan ? `<button class="btn btn-p" id="btnGmapsAll" style="width:100%;flex:1 1 100%;padding:12px 18px;margin-bottom:2px">🚗 เริ่มนำทางชุดนี้ใน Google Maps (${planItemsForDay().length} ร้าน)</button>` : '';
     view.innerHTML = (state.plan?dayTabsHtml():'') + Object.entries(groups).map(([z,items])=>
       `<div class="planzone"><h4>${esc(z)} · ${items.length} ร้าน</h4>
        <div class="grid" style="padding-bottom:0">${items.map(card).join('')}</div></div>`
@@ -995,7 +1003,7 @@ function renderMap(list){
       <div class="routebtnrow">
         <a class="routebtn" href="${gmapsDirUrl(ordered)}" target="_blank" rel="noopener">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
-          เปิดใน Google Maps
+          เริ่มนำทางใน Google Maps
         </a>
       </div>
     </div>`;
