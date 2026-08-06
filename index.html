@@ -470,6 +470,19 @@ footer a{color:var(--dim)}
       <select class="sel" id="areaSel"></select>
     </div>
     <div class="fgroup">
+      <span class="flabel">วันที่จะไป</span>
+      <select class="sel" id="daySel">
+        <option value="ALL">ทุกวัน</option>
+        <option value="0">วันจันทร์</option>
+        <option value="1">วันอังคาร</option>
+        <option value="2">วันพุธ</option>
+        <option value="3">วันพฤหัสบดี</option>
+        <option value="4">วันศุกร์</option>
+        <option value="5">วันเสาร์</option>
+        <option value="6">วันอาทิตย์</option>
+      </select>
+    </div>
+    <div class="fgroup">
       <span class="flabel">งบต่อคน ไม่เกิน</span>
       <div class="pills" id="budgetPills"></div>
     </div>
@@ -563,7 +576,7 @@ const CATICON = {
   'Street Food & Local':'สตรีทฟู้ด','อาหารตามสั่ง':'ตามสั่ง','Bar & Cocktail':'บาร์/ค็อกเทล'
 };
 
-const state = { q:'', cat:'ALL', tiers:new Set(), area:'ALL', budget:99999, sort:'tier', plan:false, view:'grid', openNow:false, near:false, reserveOnly:false, activeDay:'all', bulkEdit:false, province:'เชียงใหม่' };
+const state = { q:'', cat:'ALL', tiers:new Set(), area:'ALL', budget:99999, sort:'tier', plan:false, view:'grid', openNow:false, near:false, reserveOnly:false, activeDay:'all', bulkEdit:false, province:'เชียงใหม่', dayFilter:'ALL' };
 let bulkSelected = new Set();
 let userLoc = null;
 
@@ -605,6 +618,14 @@ function minutesUntilClose(sched){
     }
   }
   return null;
+}
+function dayCellText(sched, dayIdx){
+  if(!sched) return null;
+  const cell = sched[dayIdx];
+  if(!cell) return null; // closed that day
+  if(cell==='24h') return '24 ชม.';
+  const fmt = m=>{ m=((m%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); };
+  return cell.map(([s,e])=>`${fmt(s)}–${fmt(e)}`).join(' และ ');
 }
 function haversineKm(lat1,lng1,lat2,lng2){
   const R=6371, toRad=x=>x*Math.PI/180;
@@ -665,6 +686,7 @@ function filtered(){
     if(state.area!=='ALL' && r.area!==state.area) return false;
     if(r.bmin>state.budget) return false;
     if(state.openNow && isOpenNow(r.sched)!==true) return false;
+    if(state.dayFilter!=='ALL' && !dayCellText(r.sched, +state.dayFilter)) return false;
     if(state.reserveOnly && !r.reserve) return false;
     if(state.q){
       const hay = (r.name+' '+r.menu+' '+r.zone+' '+r.area+' '+r.tag+' '+r.why+' '+r.cat).toLowerCase();
@@ -713,7 +735,7 @@ function card(r){
     </div>
     <div class="cmeta">
       <span>${esc(r.zone)}</span><i class="dot"></i><span>${esc(CATICON[r.cat]||r.cat)}</span>
-      ${openBadge(r.sched)}
+      ${state.dayFilter!=='ALL' ? `<span class="openbadge open"><span class="dotlive"></span>เปิด ${esc(dayCellText(r.sched,+state.dayFilter))}</span>` : openBadge(r.sched)}
       ${r.reserve?'<span class="rsvbadge">📅 จองได้</span>':''}
       ${r.tag?`<span class="ctag">${esc(r.tag)}</span>`:''}
     </div>
@@ -1168,8 +1190,8 @@ function shareLine(){
 }
 function clearAll(){
   state.q=''; state.cat='ALL'; state.tiers.clear(); state.area='ALL'; state.budget=99999; state.plan=false;
-  state.openNow=false; state.near=false; state.reserveOnly=false;
-  $('#q').value=''; $('#areaSel').value='ALL';
+  state.openNow=false; state.near=false; state.reserveOnly=false; state.dayFilter='ALL';
+  $('#q').value=''; $('#areaSel').value='ALL'; $('#daySel').value='ALL';
   document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.cat==='ALL'));
   document.querySelectorAll('#tierPills .pill').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('#budgetPills .pill').forEach(p=>p.classList.toggle('on',p.dataset.budget==='99999'));
@@ -1194,6 +1216,7 @@ $('#tierPills').addEventListener('click', e=>{
   p.classList.toggle('on'); render();
 });
 $('#areaSel').addEventListener('change', e=>{ state.area=e.target.value; render(); });
+$('#daySel').addEventListener('change', e=>{ state.dayFilter=e.target.value; render(); });
 $('#budgetPills').addEventListener('click', e=>{
   const p = e.target.closest('.pill'); if(!p) return;
   state.budget = +p.dataset.budget;
