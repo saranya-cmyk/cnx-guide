@@ -314,6 +314,13 @@ select.sel{
 .leaflet-popup-content-wrapper{background:var(--surface2);color:var(--ink);border-radius:10px}
 .leaflet-popup-tip{background:var(--surface2)}
 .leaflet-popup-content{font-family:'IBM Plex Sans Thai',sans-serif;font-size:13px;margin:10px 12px}
+.cnx-tooltip{
+  background:rgba(18,20,26,.92);color:var(--ink);border:1px solid var(--line);
+  border-radius:6px;padding:3px 8px;font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:11.5px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+.cnx-tooltip::before{border-top-color:rgba(18,20,26,.92)!important}
+.leaflet-tooltip-right.cnx-tooltip::before{border-right-color:rgba(18,20,26,.92)!important}
 .popname{font-family:'Trirong',serif;font-weight:600;font-size:15px;margin-bottom:3px}
 .popmeta{color:var(--dim);font-size:11.5px;margin-bottom:6px}
 .poplink{color:var(--gold);font-size:12px;text-decoration:underline}
@@ -956,18 +963,22 @@ function renderMap(list){
   }
 
   const bounds = [];
+  const showLabels = list.length <= 25; // avoid unreadable clutter on big unfiltered views
   list.forEach(r=>{
     const marker = L.circleMarker([r.lat,r.lng], {
       radius: 8, color:'#12141a', weight:2, fillColor: TIERHEX[r.tier] || '#e2b04a',
       fillOpacity: .95
     }).addTo(mapLayer);
     marker.bindPopup(`<div class="popname">${esc(r.name)}</div><div class="popmeta">${esc(r.zone)} · ${esc(r.tier)} · ${esc(r.budget||'-')} บ./คน</div><a class="poplink" href="${esc(r.map)}" target="_blank" rel="noopener">เปิด Google Maps →</a>`);
+    if(showLabels){
+      marker.bindTooltip(esc(r.name), {permanent:true, direction:'top', offset:[0,-8], className:'cnx-tooltip'});
+    }
     bounds.push([r.lat,r.lng]);
   });
   if(bounds.length) map.fitBounds(bounds, {padding:[30,30], maxZoom:15});
 
   if(!state.plan){
-    $('#routePanel').innerHTML = `<div class="mapempty">หมุดสีคือระดับ Tier ของร้าน — กดรูปดาว ⭐ บนร้านที่สนใจแล้วสลับมาที่ "แผนของฉัน" เพื่อดูเส้นทางแนะนำ</div>`;
+    $('#routePanel').innerHTML = `<div class="mapempty">หมุดสีคือระดับ Tier ของร้าน${showLabels?'':' — ซูมเข้าหรือกรองให้เหลือน้อยลงเพื่อดูชื่อร้านบนแผนที่'} — กดรูปดาว ⭐ บนร้านที่สนใจแล้วสลับมาที่ "แผนของฉัน" เพื่อดูเส้นทางแนะนำ</div>`;
     return;
   }
 
@@ -992,7 +1003,9 @@ function renderMap(list){
     ordered.forEach((r,idx)=>{
       L.marker([r.lat,r.lng], {
         icon: L.divIcon({html:`<div class="pin-num" style="background:${color}">${idx+1}</div>`, className:'', iconSize:[22,22], iconAnchor:[11,11]})
-      }).addTo(routeLayer).bindPopup(`<div class="popname">${idx+1}. ${esc(r.name)}</div><div class="popmeta">${esc(r.menu||r.tag)}</div>`);
+      }).addTo(routeLayer)
+        .bindPopup(`<div class="popname">${idx+1}. ${esc(r.name)}</div><div class="popmeta">${esc(r.menu||r.tag)}</div>`)
+        .bindTooltip(`${idx+1}. ${esc(r.name)}`, {permanent:true, direction:'right', offset:[12,0], className:'cnx-tooltip'});
     });
 
     currentRoutes[zoneKey] = {ordered, color, latlngs: ordered.map(r=>[r.lat,r.lng])};
