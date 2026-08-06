@@ -515,12 +515,6 @@ footer a{color:var(--dim)}
 
 <div class="mapwrap" id="mapwrap">
   <div id="mapDayTabs"></div>
-  <div class="maptoolbar">
-    <button class="maptbtn" id="btnLiveLoc">
-      <span class="dotlive"></span>
-      <span id="liveLocLabel">ติดตามตำแหน่งฉันสด</span>
-    </button>
-  </div>
   <div id="leafmap"></div>
   <div class="routepanel" id="routePanel"></div>
 </div>
@@ -634,10 +628,8 @@ function haversineKm(lat1,lng1,lat2,lng2){
   return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
 }
 const TIERLABEL = {'S+':'ห้ามพลาด — ระดับ S+','S':'ยอดเยี่ยม — ระดับ S','A+':'ดีมาก — ระดับ A+','A':'ดี — ระดับ A'};
-let map, mapLayer, routeLayer, liveLayer, previewLayer;
-let liveWatchId = null, liveMarker = null;
+let map, mapLayer, routeLayer;
 let currentRoutes = {}; // zoneKey -> {latlngs, ordered, color}
-let previewAnimId = null;
 const $ = s=>document.querySelector(s);
 const esc = s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -911,8 +903,6 @@ function ensureMap(){
   }).addTo(map);
   mapLayer = L.layerGroup().addTo(map);
   routeLayer = L.layerGroup().addTo(map);
-  liveLayer = L.layerGroup().addTo(map);
-  previewLayer = L.layerGroup().addTo(map);
 }
 function renderMap(list){
   $('#mapDayTabs').innerHTML = state.plan ? dayTabsHtml() : '';
@@ -981,16 +971,10 @@ function renderMap(list){
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
           เปิดใน Google Maps
         </a>
-        ${ordered.length>1?`<button class="previewbtn" data-preview="${zoneKey}" title="ดูรถวิ่งพรีวิวเส้นทาง">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </button>`:''}
       </div>
     </div>`;
   });
   $('#routePanel').innerHTML = panelHtml;
-  $('#routePanel').querySelectorAll('[data-preview]').forEach(b=>{
-    b.addEventListener('click', ()=> playRoutePreview(b.dataset.preview));
-  });
 
   // fetch real road routes in background, replace straight lines when ready
   Object.entries(currentRoutes).forEach(async ([zoneKey, rt])=>{
@@ -1014,80 +998,6 @@ function renderMap(list){
       statEl.classList.remove('wait');
     }
   });
-}
-
-/* ---- route preview animation (simulated drive-through) ---- */
-function playRoutePreview(zoneKey){
-  const rt = currentRoutes[zoneKey];
-  if(!rt || rt.latlngs.length<2) return;
-  if(previewAnimId) cancelAnimationFrame(previewAnimId);
-  previewLayer.clearLayers();
-
-  const pts = rt.latlngs;
-  // build cumulative distance table for constant-speed interpolation
-  let total = 0;
-  const cum = [0];
-  for(let i=1;i<pts.length;i++){
-    total += haversine({lat:pts[i-1][0],lng:pts[i-1][1]}, {lat:pts[i][0],lng:pts[i][1]});
-    cum.push(total);
-  }
-  const carIcon = L.divIcon({
-    html:`<div style="width:16px;height:16px;border-radius:50%;background:${rt.color};border:2px solid #12141a;box-shadow:0 0 0 4px ${rt.color}33"></div>`,
-    className:'', iconSize:[16,16], iconAnchor:[8,8]
-  });
-  const car = L.marker(pts[0], {icon: carIcon}).addTo(previewLayer);
-  const durationMs = Math.min(6000, Math.max(2200, pts.length*180));
-  const t0 = performance.now();
-
-  function frame(now){
-    const p = Math.min(1, (now-t0)/durationMs);
-    const target = p*total;
-    let i=0; while(i<cum.length-1 && cum[i+1]<target) i++;
-    const segLen = cum[i+1]-cum[i] || 1;
-    const segP = (target-cum[i])/segLen;
-    const lat = pts[i][0] + (pts[i+1] ? (pts[i+1][0]-pts[i][0])*segP : 0);
-    const lng = pts[i][1] + (pts[i+1] ? (pts[i+1][1]-pts[i][1])*segP : 0);
-    car.setLatLng([lat,lng]);
-    if(p<1){ previewAnimId = requestAnimationFrame(frame); }
-    else { setTimeout(()=>previewLayer.removeLayer(car), 500); }
-  }
-  previewAnimId = requestAnimationFrame(frame);
-}
-
-/* ---- live location tracking ---- */
-function toggleLiveLoc(){
-  if(liveWatchId!==null){
-    navigator.geolocation.clearWatch(liveWatchId);
-    liveWatchId = null;
-    if(liveMarker){ liveLayer.removeLayer(liveMarker); liveMarker=null; }
-    $('#btnLiveLoc').classList.remove('on');
-    $('#liveLocLabel').textContent = 'ติดตามตำแหน่งฉันสด';
-    return;
-  }
-  if(!navigator.geolocation){ return toast('เบราว์เซอร์นี้ไม่รองรับการหาตำแหน่ง'); }
-  ensureMap();
-  $('#liveLocLabel').textContent = 'กำลังเชื่อมตำแหน่ง…';
-  liveWatchId = navigator.geolocation.watchPosition(
-    pos=>{
-      const ll = [pos.coords.latitude, pos.coords.longitude];
-      if(!liveMarker){
-        liveMarker = L.marker(ll, {
-          icon: L.divIcon({html:`<div style="width:18px;height:18px;border-radius:50%;background:#4a9eff;border:3px solid #fff;box-shadow:0 0 0 6px rgba(74,158,255,.3)"></div>`, className:'', iconSize:[18,18], iconAnchor:[9,9]})
-        }).addTo(liveLayer).bindPopup('ตำแหน่งฉันตอนนี้');
-        map.panTo(ll);
-      } else {
-        liveMarker.setLatLng(ll);
-      }
-      $('#btnLiveLoc').classList.add('on');
-      $('#liveLocLabel').textContent = 'กำลังติดตามตำแหน่งฉันสด';
-    },
-    ()=>{
-      toast('ขอตำแหน่งไม่สำเร็จ ลองอนุญาตการเข้าถึงตำแหน่งอีกครั้ง');
-      $('#liveLocLabel').textContent = 'ติดตามตำแหน่งฉันสด';
-      liveWatchId = null;
-    },
-    {enableHighAccuracy:true, maximumAge:5000}
-  );
 }
 
 /* ---- detail sheet ---- */
@@ -1260,7 +1170,6 @@ $('#viewTabs').addEventListener('click', e=>{
   const t = e.target.closest('.tab'); if(!t) return;
   state.view = t.dataset.view; render();
 });
-$('#btnLiveLoc').addEventListener('click', toggleLiveLoc);
 $('#pillOpenNow').addEventListener('click', ()=>{
   state.openNow = !state.openNow;
   $('#pillOpenNow').classList.toggle('on', state.openNow);
@@ -1337,10 +1246,18 @@ $('#scrim').addEventListener('click', e=>{ if(e.target===$('#scrim')) closeSheet
 
 render();
 
+// Offline caching (service worker) was removed — it caused stale versions to get
+// stuck on people's phones after every update. This actively unregisters any
+// old service worker still installed from before, so devices catch up cleanly.
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('sw.js').catch(()=>{ /* file:// or unsupported host — silently skip */ });
-  });
+  try{
+    navigator.serviceWorker.getRegistrations().then(regs=>{
+      regs.forEach(reg=>reg.unregister());
+    }).catch(()=>{});
+  }catch(e){}
+  if('caches' in window){
+    try{ caches.keys().then(names=>names.forEach(n=>caches.delete(n))).catch(()=>{}); }catch(e){}
+  }
 }
 </script>
 </body>
