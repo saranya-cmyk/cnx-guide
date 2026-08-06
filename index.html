@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CNX">
-<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ 145 ร้าน คัดตามเหตุผลที่ควรไปจริง">
+<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ 120 ร้าน คัดตามเหตุผลที่ควรไปจริง">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Trirong:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
@@ -233,6 +233,8 @@ select.sel{
 .act:hover{border-color:var(--dimmer);color:var(--ink)}
 .act.fav.on{color:var(--gold);border-color:rgba(226,176,74,.45);background:rgba(226,176,74,.1)}
 .act.chk.on{color:var(--jade);border-color:rgba(86,165,138,.45);background:rgba(86,165,138,.1)}
+.act.love.on{color:#e0577a;border-color:rgba(224,87,122,.45);background:rgba(224,87,122,.1)}
+.card.loved{box-shadow:0 0 0 1px rgba(224,87,122,.35) inset}
 .daysel{
   background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--dim);
   font-size:11px;padding:0 5px;height:31px;outline:none;
@@ -483,6 +485,7 @@ footer a{color:var(--dim)}
       <div class="pills">
         <button class="pill" id="pillOpenNow">🟢 เปิดอยู่ตอนนี้</button>
         <button class="pill" id="pillReserve">📅 รับจองได้</button>
+        <button class="pill" id="pillLoved">❤️ ที่เด็ดของฉัน</button>
         <button class="pill" id="pillNearMe">📍 ใกล้ฉัน</button>
       </div>
     </div>
@@ -538,10 +541,12 @@ const store = (()=>{
 
 let favs = new Set(store.get('cm_favs',[]));
 let done = new Set(store.get('cm_done',[]));
+let loved = new Set(store.get('cm_loved',[]));
 let favDays = store.get('cm_favdays',{});
 let maxDay = store.get('cm_maxday',1);
 const saveFavs = ()=>store.set('cm_favs',[...favs]);
 const saveDone = ()=>store.set('cm_done',[...done]);
+const saveLoved = ()=>store.set('cm_loved',[...loved]);
 const saveFavDays = ()=>store.set('cm_favdays',favDays);
 function getDay(id){ return favDays[id] || 1; }
 function setDay(id, day){ favDays[id]=day; saveFavDays(); render(); }
@@ -562,7 +567,7 @@ const CATICON = {
   'Street Food & Local':'สตรีทฟู้ด','อาหารตามสั่ง':'ตามสั่ง','Bar & Cocktail':'บาร์/ค็อกเทล'
 };
 
-const state = { q:'', cat:'ALL', tiers:new Set(), area:'ALL', budget:99999, sort:'tier', plan:false, view:'grid', openNow:false, near:false, reserveOnly:false, activeDay:'all', bulkEdit:false, province:'เชียงใหม่', dayFilter:'ALL' };
+const state = { q:'', cat:'ALL', tiers:new Set(), area:'ALL', budget:99999, sort:'tier', plan:false, view:'grid', openNow:false, near:false, reserveOnly:false, activeDay:'all', bulkEdit:false, province:'เชียงใหม่', dayFilter:'ALL', lovedOnly:false };
 let bulkSelected = new Set();
 let userLoc = null;
 
@@ -682,6 +687,7 @@ function filtered(){
     if(state.openNow && isOpenNow(r.sched)!==true) return false;
     if(state.dayFilter!=='ALL' && !dayCellText(r.sched, +state.dayFilter)) return false;
     if(state.reserveOnly && !r.reserve) return false;
+    if(state.lovedOnly && !loved.has(r.id)) return false;
     if(state.q){
       const hay = (r.name+' '+r.menu+' '+r.zone+' '+r.area+' '+r.tag+' '+r.why+' '+r.cat).toLowerCase();
       if(!state.q.toLowerCase().split(/\s+/).every(w=>hay.includes(w))) return false;
@@ -721,7 +727,7 @@ function openBadge(sched){
 function card(r){
   const bulk = state.plan && state.bulkEdit;
   const sel = bulk && bulkSelected.has(r.id);
-  return `<article class="card${done.has(r.id)?' done':''}${sel?' selected':''}" data-id="${r.id}" style="--tier:${TIERC[r.tier]}" tabindex="0" role="button">
+  return `<article class="card${done.has(r.id)?' done':''}${sel?' selected':''}${loved.has(r.id)?' loved':''}" data-id="${r.id}" style="--tier:${TIERC[r.tier]}" tabindex="0" role="button">
     ${bulk?`<div class="bulkcheck">${sel?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>':''}</div>`:''}
     <div class="chead">
       <h3 class="cname">${esc(r.name)}</h3>
@@ -742,6 +748,9 @@ function card(r){
         ${(state.plan && favs.has(r.id) && maxDay>1) ? `<select class="daysel" data-dayset="${r.id}" title="ย้ายไปวันอื่น" onclick="event.stopPropagation()">${Array.from({length:maxDay},(_,i)=>i+1).map(d=>`<option value="${d}"${getDay(r.id)===d?' selected':''}>Day ${d}</option>`).join('')}</select>` : ''}
         <button class="act fav${favs.has(r.id)?' on':''}" data-fav="${r.id}" title="เพิ่มในแผน" aria-label="เพิ่มในแผน">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="${favs.has(r.id)?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7.9 5.3-4.6-2.5-4.6 2.5.9-5.3L4.5 9.6l5.2-.7z"/></svg>
+        </button>
+        <button class="act love${loved.has(r.id)?' on':''}" data-loved="${r.id}" title="มาร์คว่าเด็ด" aria-label="มาร์คว่าเด็ด">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="${loved.has(r.id)?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s-7.5-4.9-10-9.3C.3 8.2 2 4.5 5.6 4c2-.3 3.7.7 6.4 3.2C14.7 4.7 16.4 3.7 18.4 4c3.6.5 5.3 4.2 3.6 7.7C19.5 16.1 12 21 12 21z"/></svg>
         </button>
         <button class="act chk${done.has(r.id)?' on':''}" data-done="${r.id}" title="ไปมาแล้ว" aria-label="ไปมาแล้ว">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>
@@ -859,6 +868,8 @@ function render(){
   $('#mapwrap').classList.toggle('on', state.view==='map');
   $('#resCount').innerHTML = state.plan
     ? `<b>${list.length}</b> ร้านในแผนของฉัน`
+    : state.lovedOnly
+    ? `❤️ <b>${list.length}</b> ร้านที่เด็ดของฉัน`
     : `พบ <b>${list.length}</b> ร้าน${list.length!==DATA.length?` จากทั้งหมด ${DATA.length}`:''}`;
 
   if(state.view==='map'){ renderMap(list); return; }
@@ -866,9 +877,9 @@ function render(){
   const view = $('#view');
   if(!list.length){
     view.innerHTML = (state.plan?dayTabsHtml():'') + `<div class="empty">
-      <h3>${state.plan?(state.activeDay!=='all'?`ยังไม่มีร้านใน Day ${state.activeDay}`:'ยังไม่มีร้านในแผน'):'ไม่เจอร้านที่ตรงเงื่อนไข'}</h3>
-      <p>${state.plan?'กดรูปดาวบนการ์ดร้านเพื่อเก็บไว้ในแผนวันนี้ หรือย้ายร้านจากวันอื่นมาที่นี่ผ่านเมนู Day บนการ์ด':'ลองลดเงื่อนไขลง หรือค้นด้วยคำที่สั้นกว่านี้'}</p>
-      ${state.plan?'':'<button id="btnEmptyClear">ล้างตัวกรอง</button>'}
+      <h3>${state.plan?(state.activeDay!=='all'?`ยังไม่มีร้านใน Day ${state.activeDay}`:'ยังไม่มีร้านในแผน'):(state.lovedOnly?'ยังไม่มีร้านที่มาร์คว่าเด็ด':'ไม่เจอร้านที่ตรงเงื่อนไข')}</h3>
+      <p>${state.plan?'กดรูปดาวบนการ์ดร้านเพื่อเก็บไว้ในแผนวันนี้ หรือย้ายร้านจากวันอื่นมาที่นี่ผ่านเมนู Day บนการ์ด':(state.lovedOnly?'กดรูปหัวใจบนการ์ดร้านที่คิดว่าเด็ดจริงไว้ก่อน':'ลองลดเงื่อนไขลง หรือค้นด้วยคำที่สั้นกว่านี้')}</p>
+      ${(state.plan||state.lovedOnly)?'':'<button id="btnEmptyClear">ล้างตัวกรอง</button>'}
     </div>`;
     const b = $('#btnEmptyClear'); if(b) b.onclick = clearAll;
     return;
@@ -931,6 +942,15 @@ function render(){
     ).join('');
   } else {
     view.innerHTML = `<div class="grid">${list.map(card).join('')}</div>`;
+  }
+
+  if(state.lovedOnly && !state.plan && list.length){
+    const bar = document.createElement('div');
+    bar.style.cssText = 'padding:16px 0 40px;display:flex;gap:8px;flex-wrap:wrap';
+    bar.innerHTML = `<button class="btn btn-s" id="btnCopyLoved" style="width:auto;padding:10px 18px">คัดลอกรายการเป็นข้อความ</button><button class="btn btn-s" id="btnLineLoved" style="width:auto;padding:10px 18px;color:#06C755;border-color:rgba(6,199,85,.4)">แชร์ไป LINE</button>`;
+    view.appendChild(bar);
+    $('#btnCopyLoved').onclick = ()=>copyLoved();
+    $('#btnLineLoved').onclick = ()=>shareLovedLine();
   }
 }
 
@@ -1119,6 +1139,37 @@ function toggleDone(id){
   saveDone(); render();
   toast(done.has(id)?'ทำเครื่องหมายว่าไปมาแล้ว':'ยกเลิกเครื่องหมายไปมาแล้ว');
 }
+function toggleLoved(id){
+  loved.has(id)? loved.delete(id) : loved.add(id);
+  saveLoved(); render();
+  toast(loved.has(id)?'❤️ มาร์คว่าเด็ดแล้ว':'เอาออกจากรายการเด็ดแล้ว');
+}
+function buildLovedText(){
+  const byId = Object.fromEntries(DATA.map(r=>[r.id,r]));
+  const groups = {};
+  [...loved].forEach(id=>{ const r=byId[id]; if(r) (groups[r.area] ||= []).push(r); });
+  let out = '❤️ ร้านที่เด็ดจริงของฉัน (CNX Guide)\n';
+  Object.entries(groups).forEach(([z,items])=>{
+    out += `\n【${z}】\n` + items.map(r=>`• ${r.name} — ${r.menu||r.tag} (${r.tier})\n  ${r.map}`).join('\n') + '\n';
+  });
+  return out.trim();
+}
+function copyLoved(){
+  navigator.clipboard?.writeText(buildLovedText()).then(()=>toast('คัดลอกรายการเด็ดแล้ว'))
+    .catch(()=>toast('คัดลอกไม่สำเร็จ ลองใหม่อีกครั้ง'));
+}
+function shareLovedLine(){
+  const txt = buildLovedText();
+  const url = 'line://msg/text/' + encodeURIComponent(txt);
+  let hidden = false;
+  const onHide = ()=>{ if(document.hidden) hidden = true; };
+  document.addEventListener('visibilitychange', onHide);
+  window.location.href = url;
+  setTimeout(()=>{
+    document.removeEventListener('visibilitychange', onHide);
+    if(!hidden) window.open('https://social-plugins.line.me/lineit/share?text='+encodeURIComponent(txt), '_blank');
+  }, 900);
+}
 function buildPlanText(){
   const byId = Object.fromEntries(DATA.map(r=>[r.id,r]));
   const days = daysInUse().filter(d=>[...favs].some(id=>getDay(id)===d));
@@ -1157,13 +1208,14 @@ function shareLine(){
 }
 function clearAll(){
   state.q=''; state.cat='ALL'; state.tiers.clear(); state.area='ALL'; state.budget=99999; state.plan=false;
-  state.openNow=false; state.near=false; state.reserveOnly=false; state.dayFilter='ALL';
+  state.openNow=false; state.near=false; state.reserveOnly=false; state.dayFilter='ALL'; state.lovedOnly=false;
   $('#q').value=''; $('#areaSel').value='ALL'; $('#daySel').value='ALL';
   document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.cat==='ALL'));
   document.querySelectorAll('#tierPills .pill').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('#budgetPills .pill').forEach(p=>p.classList.toggle('on',p.dataset.budget==='99999'));
   $('#pillOpenNow').classList.remove('on');
   $('#pillReserve').classList.remove('on');
+  $('#pillLoved').classList.remove('on');
   $('#pillNearMe').classList.remove('on');
   render();
 }
@@ -1229,6 +1281,12 @@ $('#pillReserve').addEventListener('click', ()=>{
   render();
   closeFiltersAndShow();
 });
+$('#pillLoved').addEventListener('click', ()=>{
+  state.lovedOnly = !state.lovedOnly;
+  $('#pillLoved').classList.toggle('on', state.lovedOnly);
+  render();
+  closeFiltersAndShow();
+});
 $('#pillNearMe').addEventListener('click', ()=>{
   if(state.near){ state.near=false; $('#pillNearMe').classList.remove('on'); render(); closeFiltersAndShow(); return; }
   if(userLoc){ state.near=true; $('#pillNearMe').classList.add('on'); render(); closeFiltersAndShow(); return; }
@@ -1260,6 +1318,8 @@ document.addEventListener('click', e=>{
   if(e.target.closest('[data-stop]')) { e.stopPropagation(); return; }
   const fav = e.target.closest('[data-fav]');
   if(fav){ e.stopPropagation(); return toggleFav(+fav.dataset.fav); }
+  const lv = e.target.closest('[data-loved]');
+  if(lv){ e.stopPropagation(); return toggleLoved(+lv.dataset.loved); }
   const dn = e.target.closest('[data-done]');
   if(dn){ e.stopPropagation(); return toggleDone(+dn.dataset.done); }
   const dt = e.target.closest('[data-day]');
