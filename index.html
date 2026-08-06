@@ -760,6 +760,36 @@ function nearestNeighborOrder(items){
   }
   return route;
 }
+function pathDistance(order){
+  let d=0;
+  for(let i=0;i<order.length-1;i++) d += haversine(order[i], order[i+1]);
+  return d;
+}
+// Exact shortest-path ordering (brute-force all permutations) for small sets.
+// Fast enough up to ~9 stops (362,880 permutations); beyond that, falls back
+// to the nearest-neighbor heuristic to avoid freezing the browser.
+function bestOrder(items){
+  if(items.length<=2) return items.slice();
+  if(items.length>9) return nearestNeighborOrder(items);
+  const n = items.length;
+  const idx = items.map((_,i)=>i);
+  let best = null, bestDist = Infinity;
+  function permute(arr, k){
+    if(k===n-1){
+      let d=0;
+      for(let i=0;i<n-1;i++) d += haversine(items[arr[i]], items[arr[i+1]]);
+      if(d<bestDist){ bestDist=d; best=arr.slice(); }
+      return;
+    }
+    for(let i=k;i<n;i++){
+      [arr[k],arr[i]]=[arr[i],arr[k]];
+      permute(arr, k+1);
+      [arr[k],arr[i]]=[arr[i],arr[k]];
+    }
+  }
+  permute(idx, 0);
+  return best.map(i=>items[i]);
+}
 function gmapsDirUrl(items){
   return 'https://www.google.com/maps/dir/' + items.map(r=>`${r.lat},${r.lng}`).join('/');
 }
@@ -836,7 +866,7 @@ function render(){
         toast(`Google Maps รองรับได้สูงสุด ~10 จุดต่อเส้นทาง (ตอนนี้เลือกไว้ ${list.length} ร้าน) จะเปิด 10 ร้านแรกตามลำดับ S+ ก่อน`);
       }
       const capped = list.slice(0,10);
-      const ordered = nearestNeighborOrder(capped);
+      const ordered = bestOrder(capped);
       window.open(gmapsDirUrl(ordered), '_blank');
     };
     const bb = $('#btnBulk'); if(bb) bb.onclick = ()=>{ state.bulkEdit=!state.bulkEdit; bulkSelected.clear(); render(); };
@@ -931,7 +961,7 @@ function renderMap(list){
   currentRoutes = {};
 
   Object.entries(groups).forEach(([zone, items])=>{
-    const ordered = nearestNeighborOrder(items);
+    const ordered = bestOrder(items);
     const color = palette[gi++ % palette.length];
     const zoneKey = 'z'+gi;
 
