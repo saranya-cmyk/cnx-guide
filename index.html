@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CNX">
-<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ 148 ร้าน คัดตามเหตุผลที่ควรไปจริง">
+<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ 120 ร้าน คัดตามเหตุผลที่ควรไปจริง">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Trirong:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
@@ -893,9 +893,10 @@ function render(){
     view.innerHTML = (state.plan?dayTabsHtml():'') + Object.entries(groups).map(([z,items])=>
       `<div class="planzone"><h4>${esc(z)} · ${items.length} ร้าน</h4>
        <div class="grid" style="padding-bottom:0">${items.map(card).join('')}</div></div>`
-    ).join('') + (state.plan?`<div style="padding:4px 0 40px;display:flex;gap:8px;flex-wrap:wrap">${gmapsAllBtn}${bulkBtn}<button class="btn btn-s" id="btnCopy" style="width:auto;padding:10px 18px">คัดลอกแผนเป็นข้อความ</button><button class="btn btn-s" id="btnLine" style="width:auto;padding:10px 18px;color:#06C755;border-color:rgba(6,199,85,.4)">แชร์ไป LINE</button></div>`:'');
+    ).join('') + (state.plan?`<div style="padding:4px 0 40px;display:flex;gap:8px;flex-wrap:wrap">${gmapsAllBtn}${bulkBtn}<button class="btn btn-s" id="btnCopy" style="width:auto;padding:10px 18px">คัดลอกแผนเป็นข้อความ</button><button class="btn btn-s" id="btnLine" style="width:auto;padding:10px 18px;color:#06C755;border-color:rgba(6,199,85,.4)">แชร์ไป LINE</button><button class="btn btn-s" id="btnShareLink" style="width:auto;padding:10px 18px;color:var(--gold);border-color:rgba(226,176,74,.4)">🔗 แชร์แผนเป็นลิงก์</button></div>`:'');
     const c = $('#btnCopy'); if(c) c.onclick = ()=>copyPlan();
     const ln = $('#btnLine'); if(ln) ln.onclick = ()=>shareLine();
+    const sl = $('#btnShareLink'); if(sl) sl.onclick = ()=>shareLink();
     const ga = $('#btnGmapsAll'); if(ga) ga.onclick = ()=>{
       const full = planItemsForDay();
       if(full.length<1) return;
@@ -1206,6 +1207,46 @@ function shareLine(){
     }
   }, 900);
 }
+function buildPlanLink(){
+  const pairs = [...favs].map(id=>`${id}-${getDay(id)}`).join(',');
+  const base = location.origin + location.pathname;
+  return `${base}?plan=${encodeURIComponent(pairs)}`;
+}
+async function shareLink(){
+  if(!favs.size) return;
+  const url = buildPlanLink();
+  if(navigator.share){
+    try{
+      await navigator.share({ title: 'แผนกินเชียงใหม่ (CNX Guide)', text: 'เพื่อนแชร์แผนร้านมาให้ กดลิงก์เพื่อเปิดดู', url });
+      return;
+    }catch(e){ /* user cancelled share sheet — fall through to copy */ }
+  }
+  navigator.clipboard?.writeText(url).then(()=>toast('คัดลอกลิงก์แผนแล้ว ส่งให้เพื่อนได้เลย'))
+    .catch(()=>toast('คัดลอกไม่สำเร็จ ลองใหม่อีกครั้ง'));
+}
+function loadPlanFromUrl(){
+  const params = new URLSearchParams(location.search);
+  const raw = params.get('plan');
+  if(!raw) return;
+  const validIds = new Set(DATA.map(r=>r.id));
+  let added = 0;
+  raw.split(',').forEach(pair=>{
+    const [idStr, dayStr] = pair.split('-');
+    const id = parseInt(idStr,10), day = parseInt(dayStr,10) || 1;
+    if(validIds.has(id)){
+      if(!favs.has(id)) added++;
+      favs.add(id);
+      favDays[id] = Math.max(favDays[id]||1, day);
+      if(day > maxDay) maxDay = Math.min(7, day);
+    }
+  });
+  saveFavs(); saveFavDays(); store.set('cm_maxday', maxDay);
+  history.replaceState(null, '', location.pathname);
+  if(added>0){
+    state.plan = true;
+    toast(`เพิ่มแผนที่เพื่อนแชร์มา ${added} ร้านแล้ว!`);
+  }
+}
 function clearAll(){
   state.q=''; state.cat='ALL'; state.tiers.clear(); state.area='ALL'; state.budget=99999; state.plan=false;
   state.openNow=false; state.near=false; state.reserveOnly=false; state.dayFilter='ALL'; state.lovedOnly=false;
@@ -1351,6 +1392,7 @@ document.addEventListener('keydown', e=>{
 });
 $('#scrim').addEventListener('click', e=>{ if(e.target===$('#scrim')) closeSheet(); });
 
+loadPlanFromUrl();
 render();
 
 // Offline caching (service worker) was removed — it caused stale versions to get
