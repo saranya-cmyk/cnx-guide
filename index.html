@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CNX">
-<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ 156 ร้าน คัดตามเหตุผลที่ควรไปจริง">
+<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ 120 ร้าน คัดตามเหตุผลที่ควรไปจริง">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Trirong:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
@@ -566,6 +566,12 @@ const CATICON = {
   'Thai & Fine Dining':'ไทย/ไฟน์ไดน์','International':'อินเตอร์','Bakery & Dessert':'เบเกอรี่/ของหวาน',
   'Street Food & Local':'สตรีทฟู้ด','อาหารตามสั่ง':'ตามสั่ง','Bar & Cocktail':'บาร์/ค็อกเทล'
 };
+// Fixed display order for category chips — same position in every province,
+// regardless of which categories that province happens to have.
+const CAT_ORDER = [
+  'Cafe & Coffee','Breakfast & Brunch','อาหารเหนือ','Thai & Fine Dining',
+  'International','Bakery & Dessert','Street Food & Local','อาหารตามสั่ง','Bar & Cocktail'
+];
 
 const state = { q:'', cat:'ALL', tiers:new Set(), area:'ALL', budget:99999, sort:'tier', plan:false, view:'grid', openNow:false, near:false, reserveOnly:false, activeDay:'all', bulkEdit:false, province:'เชียงใหม่', dayFilter:'ALL', lovedOnly:false };
 let bulkSelected = new Set();
@@ -643,7 +649,7 @@ function rebuildForProvince(){
   $('#gReserve').textContent = sd.filter(r=>r.reserve).length;
   updateGlanceOpen();
 
-  const cats = [...new Set(sd.map(r=>r.cat))];
+  const cats = CAT_ORDER.filter(c=>sd.some(r=>r.cat===c));
   $('#catChips').innerHTML = [['ALL','ทั้งหมด',sd.length]]
     .concat(cats.map(c=>[c, CATICON[c]||c, sd.filter(r=>r.cat===c).length]))
     .map(([v,l,n])=>`<button class="chip${v==='ALL'?' on':''}" data-cat="${esc(v)}">${esc(l)}<span class="n">${n}</span></button>`).join('');
