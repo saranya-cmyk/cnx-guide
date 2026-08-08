@@ -248,6 +248,13 @@ select.sel{
 .act.chk.on{color:var(--jade);border-color:rgba(86,165,138,.45);background:rgba(86,165,138,.1)}
 .act.love.on{color:#e0577a;border-color:rgba(224,87,122,.45);background:rgba(224,87,122,.1)}
 .card.loved{box-shadow:0 0 0 1px rgba(224,87,122,.35) inset}
+.card.closingsoon{
+  background:linear-gradient(180deg, rgba(226,176,74,.16), rgba(226,176,74,.04) 60%, transparent);
+  border-left:4px solid var(--gold);
+  border-top-color:rgba(226,176,74,.4); border-right-color:rgba(226,176,74,.4); border-bottom-color:rgba(226,176,74,.4);
+  box-shadow:0 0 0 1px rgba(226,176,74,.25), 0 4px 20px rgba(226,176,74,.15);
+}
+.card.closingsoon .cname{color:var(--gold)}
 .daysel{
   background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--dim);
   font-size:11px;padding:0 5px;height:31px;outline:none;
@@ -752,7 +759,8 @@ function openBadge(sched){
 function card(r){
   const bulk = state.plan && state.bulkEdit;
   const sel = bulk && bulkSelected.has(r.id);
-  return `<article class="card${done.has(r.id)?' done':''}${sel?' selected':''}${loved.has(r.id)?' loved':''}" data-id="${r.id}" style="--tier:${TIERC[r.tier]}" tabindex="0" role="button">
+  const closingSoon = isOpenNow(r.sched)===true && minutesUntilClose(r.sched)!==null && minutesUntilClose(r.sched)<=60;
+  return `<article class="card${done.has(r.id)?' done':''}${sel?' selected':''}${loved.has(r.id)?' loved':''}${closingSoon?' closingsoon':''}" data-id="${r.id}" style="--tier:${TIERC[r.tier]}" tabindex="0" role="button">
     ${bulk?`<div class="bulkcheck">${sel?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>':''}</div>`:''}
     <div class="chead">
       <h3 class="cname">${esc(r.name)}</h3>
