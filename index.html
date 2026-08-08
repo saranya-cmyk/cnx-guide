@@ -339,6 +339,8 @@ select.sel{
   font-family:'Chakra Petch',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--gold);margin:0 0 10px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;
 }
+.routecard h5 > span:first-child{display:inline-flex;align-items:center;gap:7px}
+.colordot{width:9px;height:9px;border-radius:50%;flex:none;display:inline-block}
 .routecard h5::after{content:'';flex:1;height:1px;background:var(--line);min-width:14px}
 .routestat{
   font-family:'Chakra Petch',sans-serif;font-size:11px;color:var(--jade);text-transform:none;
@@ -1020,6 +1022,7 @@ function renderMap(list){
   list.forEach(r=>(groups[r.area] ||= []).push(r));
   const palette = ['#e2b04a','#56a58a','#7fa3c9','#d9614a','#c98f2a'];
   let gi = 0;
+  let globalNum = 0; // continuous 1,2,3... across all zones, not restarted per zone
   let panelHtml = '';
   currentRoutes = {};
 
@@ -1027,6 +1030,7 @@ function renderMap(list){
     const ordered = bestOrder(items);
     const color = palette[gi++ % palette.length];
     const zoneKey = 'z'+gi;
+    const startNum = globalNum; // running total before this zone's stops
 
     // draw straight-line placeholder immediately
     let line = null;
@@ -1034,18 +1038,19 @@ function renderMap(list){
       line = L.polyline(ordered.map(r=>[r.lat,r.lng]), {color, weight:3, opacity:.75, dashArray:'6 6'}).addTo(routeLayer);
     }
     ordered.forEach((r,idx)=>{
+      globalNum++;
       L.marker([r.lat,r.lng], {
-        icon: L.divIcon({html:`<div class="pin-num" style="background:${color}">${idx+1}</div>`, className:'', iconSize:[22,22], iconAnchor:[11,11]})
+        icon: L.divIcon({html:`<div class="pin-num" style="background:${color}">${globalNum}</div>`, className:'', iconSize:[22,22], iconAnchor:[11,11]})
       }).addTo(routeLayer)
-        .bindPopup(`<div class="popname">${esc(zone)} · จุดที่ ${idx+1}</div><div class="popname">${esc(r.name)}</div><div class="popmeta">${esc(r.menu||r.tag)}</div>`)
-        .bindTooltip(`${esc(zone)} #${idx+1}: ${esc(r.name)}`, {permanent:true, direction:'right', offset:[12,0], className:'cnx-tooltip'});
+        .bindPopup(`<div class="popname">${globalNum}. ${esc(r.name)}</div><div class="popmeta">${esc(zone)}</div><div class="popmeta">${esc(r.menu||r.tag)}</div>`)
+        .bindTooltip(`${globalNum}. ${esc(r.name)} (${esc(zone)})`, {permanent:true, direction:'right', offset:[12,0], className:'cnx-tooltip'});
     });
 
     currentRoutes[zoneKey] = {ordered, color, latlngs: ordered.map(r=>[r.lat,r.lng])};
 
     panelHtml += `<div class="routecard" data-zonekey="${zoneKey}">
-      <h5><span>${esc(zone)} · ${ordered.length} จุด</span><span class="routestat wait" id="stat-${zoneKey}">${ordered.length>1?'กำลังคำนวณระยะทางถนนจริง…':'จุดเดียว'}</span></h5>
-      <ul class="routelist">${ordered.map((r,idx)=>`<li><span class="rn">${idx+1}</span><div><div class="rname">${esc(r.name)}</div><div class="rmeta">${esc(r.menu||r.tag||'')}</div></div></li>`).join('')}</ul>
+      <h5><span><span class="colordot" style="background:${color}"></span>${esc(zone)} · ${ordered.length} จุด</span><span class="routestat wait" id="stat-${zoneKey}">${ordered.length>1?'กำลังคำนวณระยะทางถนนจริง…':'จุดเดียว'}</span></h5>
+      <ul class="routelist">${ordered.map((r,idx)=>`<li><span class="rn">${startNum+idx+1}</span><div><div class="rname">${esc(r.name)}</div><div class="rmeta">${esc(r.menu||r.tag||'')}</div></div></li>`).join('')}</ul>
       <div class="routebtnrow">
         <a class="routebtn" href="${gmapsDirUrl(ordered)}" target="_blank" rel="noopener">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
@@ -1054,7 +1059,7 @@ function renderMap(list){
       </div>
     </div>`;
   });
-  $('#routePanel').innerHTML = panelHtml;
+  $('#routePanel').innerHTML = `<div class="mapempty" style="text-align:left;padding:12px 16px;margin-bottom:4px">🎨 สีของหมุด = แยกกลุ่มเส้นทางตามโซน (ไม่ใช่ระดับ Tier) · ตัวเลข = ลำดับแนะนำให้ไปตามนั้น</div>` + panelHtml;
 
   // fetch real road routes in background, replace straight lines when ready
   Object.entries(currentRoutes).forEach(async ([zoneKey, rt])=>{
