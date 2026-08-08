@@ -1250,7 +1250,8 @@ function loadPlanFromUrl(){
   history.replaceState(null, '', location.pathname);
   if(added>0){
     state.plan = true;
-    toast(`เพิ่มแผนที่เพื่อนแชร์มา ${added} ร้านแล้ว!`);
+    state.view = 'map'; // open straight to the map — cleaner first look for a shared plan
+    toast(`เพื่อนแชร์แผน ${added} ร้านมาให้! 🗺️`);
   }
 }
 function clearAll(){
