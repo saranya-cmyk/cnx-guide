@@ -199,6 +199,7 @@ select.sel{
 .bulkbtn{padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600}
 .bulkbtn.danger{background:var(--chili);color:#fff}
 .bulkbtn.ghost{background:var(--surface2);border:1px solid var(--line);color:var(--dim)}
+.bulkbtn.ghost.on{background:rgba(86,165,138,.14);border-color:var(--jade);color:var(--jade)}
 .chead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:3px}
 .cname{font-family:'Trirong',serif;font-weight:600;font-size:19px;line-height:1.28;margin:0;letter-spacing:-.005em}
 .seal{
@@ -942,18 +943,21 @@ function render(){
     };
     const bb = $('#btnBulk'); if(bb) bb.onclick = ()=>{ state.bulkEdit=!state.bulkEdit; bulkSelected.clear(); render(); };
     if(state.bulkEdit){
+      const allIds = list.map(r=>r.id);
+      const allSelected = allIds.length>0 && allIds.every(id=>bulkSelected.has(id));
       const bar = document.createElement('div');
       bar.className = 'bulkbar';
       bar.innerHTML = `<span class="cnt">เลือกแล้ว <b>${bulkSelected.size}</b> ร้าน</span>
         <div class="bbtns">
-          <button class="bulkbtn ghost" id="btnSelAll">เลือกทั้งหมด</button>
+          <button class="bulkbtn ghost${allSelected?' on':''}" id="btnSelAll">${allSelected?'✓ เลือกครบทุกร้านแล้ว':'เลือกทั้งหมด'}</button>
           <button class="bulkbtn danger" id="btnBulkDel" ${bulkSelected.size?'':'disabled style="opacity:.4"'}>ลบที่เลือก</button>
         </div>`;
       view.appendChild(bar);
       $('#btnSelAll').onclick = ()=>{
         const allIds = list.map(r=>r.id);
-        if(allIds.every(id=>bulkSelected.has(id))) allIds.forEach(id=>bulkSelected.delete(id));
-        else allIds.forEach(id=>bulkSelected.add(id));
+        const wasAllSelected = allIds.every(id=>bulkSelected.has(id));
+        if(wasAllSelected){ allIds.forEach(id=>bulkSelected.delete(id)); toast('ยกเลิกการเลือกทั้งหมดแล้ว'); }
+        else { allIds.forEach(id=>bulkSelected.add(id)); toast(`เลือกครบ ${allIds.length} ร้านแล้ว`); }
         render();
       };
       const del = $('#btnBulkDel');
