@@ -717,7 +717,7 @@ function filtered(){
     if(state.area!=='ALL' && r.area!==state.area) return false;
     if(r.bmin>state.budget) return false;
     if(state.openNow && isOpenNow(r.sched)!==true) return false;
-    if(state.dayFilter!=='ALL' && !dayCellText(r.sched, +state.dayFilter)) return false;
+    if(!state.plan && state.dayFilter!=='ALL' && !dayCellText(r.sched, +state.dayFilter)) return false;
     if(state.reserveOnly && !r.reserve) return false;
     if(state.lovedOnly && !loved.has(r.id)) return false;
     if(state.q){
