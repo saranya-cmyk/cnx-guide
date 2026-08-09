@@ -730,14 +730,19 @@ function filtered(){
     if(!state.plan && r.prov!==state.province) return false;
     if(state.plan && !favs.has(r.id)) return false;
     if(state.plan && state.activeDay!=='all' && getDay(r.id)!==state.activeDay) return false;
-    if(state.cat!=='ALL' && r.cat!==state.cat) return false;
-    if(state.tiers.size && !state.tiers.has(r.tier)) return false;
-    if(state.areas.size && !state.areas.has(r.area)) return false;
-    if(r.bmin>state.budget) return false;
-    if(state.openNow && isOpenNow(r.sched)!==true) return false;
-    if(!state.plan && state.dayFilter!=='ALL' && !dayCellText(r.sched, +state.dayFilter)) return false;
-    if(state.reserveOnly && !r.reserve) return false;
-    if(state.lovedOnly && !loved.has(r.id)) return false;
+    // Everything below only applies when browsing — once something is saved
+    // in the plan, it should always show there regardless of any filter
+    // left active from earlier browsing (category/tier/zone/budget/etc).
+    if(!state.plan){
+      if(state.cat!=='ALL' && r.cat!==state.cat) return false;
+      if(state.tiers.size && !state.tiers.has(r.tier)) return false;
+      if(state.areas.size && !state.areas.has(r.area)) return false;
+      if(r.bmin>state.budget) return false;
+      if(state.openNow && isOpenNow(r.sched)!==true) return false;
+      if(state.dayFilter!=='ALL' && !dayCellText(r.sched, +state.dayFilter)) return false;
+      if(state.reserveOnly && !r.reserve) return false;
+      if(state.lovedOnly && !loved.has(r.id)) return false;
+    }
     if(state.q){
       const hay = (r.name+' '+r.menu+' '+r.zone+' '+r.area+' '+r.tag+' '+r.why+' '+r.cat).toLowerCase();
       if(!state.q.toLowerCase().split(/\s+/).every(w=>hay.includes(w))) return false;
@@ -1376,7 +1381,28 @@ $('#sortSel').addEventListener('change', e=>{ state.sort=e.target.value; render(
 $('#btnFilter').addEventListener('click', ()=>{
   const f=$('#filters'); f.classList.toggle('open'); $('#btnFilter').classList.toggle('on',f.classList.contains('open'));
 });
-$('#btnPlan').addEventListener('click', ()=>{ state.plan=!state.plan; state.bulkEdit=false; bulkSelected.clear(); render(); window.scrollTo({top:0,behavior:'smooth'}); });
+$('#btnPlan').addEventListener('click', ()=>{
+  state.plan=!state.plan;
+  state.bulkEdit=false; bulkSelected.clear();
+  if(state.plan){
+    // Entering the plan view — clear any leftover browse-only filters so
+    // "แผนของฉัน" always shows everything you've saved, not a stale filtered
+    // subset from whatever you were browsing before.
+    state.cat='ALL'; state.tiers.clear(); state.areas.clear(); state.budget=99999;
+    state.openNow=false; state.dayFilter='ALL'; state.reserveOnly=false; state.lovedOnly=false;
+    $('#q').value=''; state.q='';
+    document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.cat==='ALL'));
+    document.querySelectorAll('#tierPills .pill').forEach(p=>p.classList.remove('on'));
+    document.querySelectorAll('#areaPills .pill').forEach(p=>p.classList.remove('on'));
+    document.querySelectorAll('#budgetPills .pill').forEach(p=>p.classList.toggle('on',p.dataset.budget==='99999'));
+    const daySel = $('#daySel'); if(daySel) daySel.value='ALL';
+    $('#pillOpenNow')?.classList.remove('on');
+    $('#pillReserve')?.classList.remove('on');
+    $('#pillLoved')?.classList.remove('on');
+  }
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+});
 $('#provTabs').addEventListener('click', e=>{
   const t = e.target.closest('.ptab'); if(!t) return;
   state.province = t.dataset.prov;
