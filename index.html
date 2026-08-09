@@ -1510,6 +1510,19 @@ $('#scrim').addEventListener('click', e=>{ if(e.target===$('#scrim')) closeSheet
   banner.hidden = false;
 })();
 
+// Keep all open tabs/windows in sync — if a favorite/loved/visited mark
+// changes in one tab, other open tabs pick it up immediately instead of
+// showing stale counts or including removed items in a shared link.
+window.addEventListener('storage', (e)=>{
+  if(!['cm_favs','cm_favdays','cm_loved','cm_done','cm_maxday'].includes(e.key)) return;
+  favs = new Set(store.get('cm_favs', []));
+  favDays = store.get('cm_favdays', {});
+  loved = new Set(store.get('cm_loved', []));
+  done = new Set(store.get('cm_done', []));
+  maxDay = store.get('cm_maxday', 1);
+  render();
+});
+
 loadPlanFromUrl();
 render();
 
