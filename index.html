@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CNX">
-<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ ลำพูน ลำปาง 157 ร้าน คัดตามเหตุผลที่ควรไปจริง">
+<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ ลำพูน ลำปาง 156 ร้าน คัดตามเหตุผลที่ควรไปจริง">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Trirong:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
@@ -158,6 +158,11 @@ h1 em{font-style:normal;color:var(--gold)}
   color:var(--dimmer);text-transform:uppercase;margin-bottom:6px;display:block;
 }
 .pills{display:flex;flex-wrap:wrap;gap:5px}
+.nearhint{
+  margin:12px 0 -6px;font-size:12.5px;color:var(--jade);background:rgba(86,165,138,.1);
+  border:1px solid rgba(86,165,138,.3);border-radius:10px;padding:9px 12px;
+  display:flex;align-items:center;flex-wrap:wrap;gap:8px;
+}
 .pill{
   padding:4px 11px;border-radius:7px;border:1px solid var(--line);background:var(--surface);
   color:var(--dim);font-size:12.5px;transition:.15s;
@@ -495,9 +500,9 @@ footer a{color:var(--dim)}
       <span class="flabel">ระดับความน่าไป</span>
       <div class="pills" id="tierPills"></div>
     </div>
-    <div class="fgroup">
-      <span class="flabel">โซน</span>
-      <select class="sel" id="areaSel"></select>
+    <div class="fgroup" style="flex:1 1 100%">
+      <span class="flabel">โซน (เลือกได้หลายอัน)</span>
+      <div class="pills" id="areaPills"></div>
     </div>
     <div class="fgroup">
       <span class="flabel">วันที่จะไป</span>
@@ -530,6 +535,8 @@ footer a{color:var(--dim)}
     </div>
   </div>
 </div>
+
+<div id="nearMeHint" class="nearhint" hidden></div>
 
 <div class="resbar">
   <div class="rescount" id="resCount"></div>
@@ -611,7 +618,7 @@ const CAT_ORDER = [
   'วัด/สายมู'
 ];
 
-const state = { q:'', cat:'ALL', tiers:new Set(), area:'ALL', budget:99999, sort:'tier', plan:false, view:'grid', openNow:false, near:false, reserveOnly:false, activeDay:'all', bulkEdit:false, province:'เชียงใหม่', dayFilter:'ALL', lovedOnly:false };
+const state = { q:'', cat:'ALL', tiers:new Set(), areas:new Set(), budget:99999, sort:'tier', plan:false, view:'grid', openNow:false, near:false, reserveOnly:false, activeDay:'all', bulkEdit:false, province:'เชียงใหม่', dayFilter:'ALL', lovedOnly:false };
 let bulkSelected = new Set();
 let userLoc = null;
 
@@ -692,10 +699,9 @@ function rebuildForProvince(){
     .concat(cats.map(c=>[c, CATICON[c]||c, sd.filter(r=>r.cat===c).length]))
     .map(([v,l,n])=>`<button class="chip${v==='ALL'?' on':''}" data-cat="${esc(v)}">${esc(l)}<span class="n">${n}</span></button>`).join('');
 
-  $('#areaSel').innerHTML = `<option value="ALL">ทุกโซน</option>` +
-    areas.map(a=>`<option value="${esc(a)}">${esc(a)} (${sd.filter(r=>r.area===a).length})</option>`).join('');
+  $('#areaPills').innerHTML = areas.map(a=>`<button class="pill" data-area="${esc(a)}">${esc(a)} <span style="opacity:.6">${sd.filter(r=>r.area===a).length}</span></button>`).join('');
 
-  state.cat='ALL'; state.area='ALL';
+  state.cat='ALL'; state.areas.clear();
 }
 function updateGlanceOpen(){
   $('#gOpen').textContent = scoped().filter(r=>isOpenNow(r.sched)===true).length;
@@ -726,7 +732,7 @@ function filtered(){
     if(state.plan && state.activeDay!=='all' && getDay(r.id)!==state.activeDay) return false;
     if(state.cat!=='ALL' && r.cat!==state.cat) return false;
     if(state.tiers.size && !state.tiers.has(r.tier)) return false;
-    if(state.area!=='ALL' && r.area!==state.area) return false;
+    if(state.areas.size && !state.areas.has(r.area)) return false;
     if(r.bmin>state.budget) return false;
     if(state.openNow && isOpenNow(r.sched)!==true) return false;
     if(!state.plan && state.dayFilter!=='ALL' && !dayCellText(r.sched, +state.dayFilter)) return false;
@@ -1315,16 +1321,18 @@ function loadPlanFromUrl(){
   }
 }
 function clearAll(){
-  state.q=''; state.cat='ALL'; state.tiers.clear(); state.area='ALL'; state.budget=99999; state.plan=false;
+  state.q=''; state.cat='ALL'; state.tiers.clear(); state.areas.clear(); state.budget=99999; state.plan=false;
   state.openNow=false; state.near=false; state.reserveOnly=false; state.dayFilter='ALL'; state.lovedOnly=false;
-  $('#q').value=''; $('#areaSel').value='ALL'; $('#daySel').value='ALL';
+  $('#q').value=''; $('#daySel').value='ALL';
   document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.cat==='ALL'));
   document.querySelectorAll('#tierPills .pill').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('#areaPills .pill').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('#budgetPills .pill').forEach(p=>p.classList.toggle('on',p.dataset.budget==='99999'));
   $('#pillOpenNow').classList.remove('on');
   $('#pillReserve').classList.remove('on');
   $('#pillLoved').classList.remove('on');
   $('#pillNearMe').classList.remove('on');
+  $('#nearMeHint').hidden = true;
   render();
 }
 
@@ -1348,7 +1356,14 @@ $('#tierPills').addEventListener('click', e=>{
   p.classList.toggle('on'); render();
   closeFiltersAndShow();
 });
-$('#areaSel').addEventListener('change', e=>{ state.area=e.target.value; render(); closeFiltersAndShow(); });
+$('#areaPills').addEventListener('click', e=>{
+  const p = e.target.closest('.pill'); if(!p) return;
+  const a = p.dataset.area;
+  state.areas.has(a) ? state.areas.delete(a) : state.areas.add(a);
+  p.classList.toggle('on');
+  render();
+  closeFiltersAndShow();
+});
 $('#daySel').addEventListener('change', e=>{ state.dayFilter=e.target.value; render(); closeFiltersAndShow(); });
 $('#budgetPills').addEventListener('click', e=>{
   const p = e.target.closest('.pill'); if(!p) return;
@@ -1395,9 +1410,30 @@ $('#pillLoved').addEventListener('click', ()=>{
   render();
   closeFiltersAndShow();
 });
+function showNearbyZone(){
+  if(!userLoc) return;
+  const sd = scoped();
+  if(!sd.length){ $('#nearMeHint').hidden = true; return; }
+  const dists = {};
+  sd.forEach(r=>{
+    const d = haversineKm(userLoc.lat, userLoc.lng, r.lat, r.lng);
+    if(dists[r.area]===undefined || d<dists[r.area]) dists[r.area] = d;
+  });
+  const sorted = Object.entries(dists).sort((a,b)=>a[1]-b[1]);
+  const [nearestArea, nearestKm] = sorted[0];
+  const hint = $('#nearMeHint');
+  hint.hidden = false;
+  hint.innerHTML = `📍 คุณอยู่ใกล้โซน <b>${esc(nearestArea)}</b> (~${nearestKm.toFixed(1)} กม.) <button class="pill" style="padding:2px 10px;margin-left:6px" id="btnUseNearArea">เลือกโซนนี้</button>`;
+  const btn = document.getElementById('btnUseNearArea');
+  if(btn) btn.onclick = ()=>{
+    state.areas.clear(); state.areas.add(nearestArea);
+    document.querySelectorAll('#areaPills .pill').forEach(p=>p.classList.toggle('on', p.dataset.area===nearestArea));
+    render();
+  };
+}
 $('#pillNearMe').addEventListener('click', ()=>{
-  if(state.near){ state.near=false; $('#pillNearMe').classList.remove('on'); render(); closeFiltersAndShow(); return; }
-  if(userLoc){ state.near=true; $('#pillNearMe').classList.add('on'); render(); closeFiltersAndShow(); return; }
+  if(state.near){ state.near=false; $('#pillNearMe').classList.remove('on'); $('#nearMeHint').hidden=true; render(); closeFiltersAndShow(); return; }
+  if(userLoc){ state.near=true; $('#pillNearMe').classList.add('on'); showNearbyZone(); render(); closeFiltersAndShow(); return; }
   if(!navigator.geolocation){ return toast('เบราว์เซอร์นี้ไม่รองรับการหาตำแหน่ง'); }
   $('#pillNearMe').textContent = '📍 กำลังหาตำแหน่ง…';
   navigator.geolocation.getCurrentPosition(
@@ -1406,6 +1442,7 @@ $('#pillNearMe').addEventListener('click', ()=>{
       state.near = true;
       $('#pillNearMe').textContent = '📍 ใกล้ฉัน';
       $('#pillNearMe').classList.add('on');
+      showNearbyZone();
       render();
       closeFiltersAndShow();
       toast('เรียงตามระยะใกล้ฉันแล้ว');
