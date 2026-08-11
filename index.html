@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CNX">
-<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ ลำพูน ลำปาง 161 ร้าน คัดตามเหตุผลที่ควรไปจริง">
+<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ ลำพูน ลำปาง 156 ร้าน คัดตามเหตุผลที่ควรไปจริง">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Trirong:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
@@ -1359,7 +1359,7 @@ $('#tierPills').addEventListener('click', e=>{
   const t = p.dataset.tier;
   state.tiers.has(t)? state.tiers.delete(t) : state.tiers.add(t);
   p.classList.toggle('on'); render();
-  closeFiltersAndShow();
+  // multi-select — keep the panel open so more tiers can be picked in one go
 });
 $('#areaPills').addEventListener('click', e=>{
   const p = e.target.closest('.pill'); if(!p) return;
@@ -1367,7 +1367,7 @@ $('#areaPills').addEventListener('click', e=>{
   state.areas.has(a) ? state.areas.delete(a) : state.areas.add(a);
   p.classList.toggle('on');
   render();
-  closeFiltersAndShow();
+  // multi-select — keep the panel open so more zones can be picked in one go
 });
 $('#daySel').addEventListener('change', e=>{ state.dayFilter=e.target.value; render(); closeFiltersAndShow(); });
 $('#budgetPills').addEventListener('click', e=>{
