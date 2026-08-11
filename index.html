@@ -284,6 +284,15 @@ select.sel{
   border-style:dashed;color:var(--dimmer);font-weight:400;padding:6px 12px;
 }
 .daytab.add:hover{color:var(--gold);border-color:var(--gold)}
+.daytabwrap{position:relative;display:inline-flex}
+.daytabwrap .daytab{padding-right:26px}
+.daytabdel{
+  position:absolute;right:4px;top:50%;transform:translateY(-50%);
+  width:17px;height:17px;border-radius:50%;background:rgba(0,0,0,.25);
+  color:inherit;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;
+  opacity:.6;
+}
+.daytabdel:hover{opacity:1;background:rgba(217,97,74,.5);color:#fff}
 
 .empty{text-align:center;padding:64px 20px;color:var(--dim)}
 .empty h3{font-family:'Trirong',serif;font-size:21px;color:var(--ink);margin:0 0 7px}
@@ -938,11 +947,36 @@ function dayTabsHtml(){
   html += `<button class="daytab${state.activeDay==='all'?' on':''}" data-day="all">ทั้งหมด <span style="opacity:.6">${favs.size}</span></button>`;
   days.forEach(d=>{
     const cnt = [...favs].filter(id=>getDay(id)===d).length;
-    html += `<button class="daytab${state.activeDay===d?' on':''}" data-day="${d}">Day ${d} <span style="opacity:.6">${cnt}</span></button>`;
+    html += `<span class="daytabwrap">
+      <button class="daytab${state.activeDay===d?' on':''}" data-day="${d}">Day ${d} <span style="opacity:.6">${cnt}</span></button>
+      ${days.length>1?`<button class="daytabdel" data-deldayta="${d}" title="ลบ Day ${d}" aria-label="ลบ Day ${d}">×</button>`:''}
+    </span>`;
   });
   if(maxDay<7) html += `<button class="daytab add" data-day="add">+ เพิ่มวัน</button>`;
   html += '</div>';
   return html;
+}
+function removeDay(dayNum){
+  const days = daysInUse();
+  if(days.length<=1) return;
+  const itemsInDay = [...favs].filter(id=>getDay(id)===dayNum);
+  if(itemsInDay.length){
+    const ok = confirm(`Day ${dayNum} มีร้านอยู่ ${itemsInDay.length} ร้าน ถ้าลบวันนี้ ร้านทั้งหมดจะถูกย้ายไป Day 1 ต้องการดำเนินการต่อหรือไม่?`);
+    if(!ok) return;
+    itemsInDay.forEach(id=>{ favDays[id]=1; });
+  }
+  Object.keys(favDays).forEach(id=>{
+    if(favDays[id] > dayNum) favDays[id] -= 1;
+  });
+  saveFavDays();
+  if(maxDay>1) maxDay -= 1;
+  store.set('cm_maxday', maxDay);
+  if(state.activeDay !== 'all'){
+    if(state.activeDay === dayNum) state.activeDay = 'all';
+    else if(state.activeDay > dayNum) state.activeDay -= 1;
+  }
+  render();
+  toast(`ลบ Day ${dayNum} แล้ว`);
 }
 function render(){
   const list = filtered();
@@ -1530,6 +1564,8 @@ document.addEventListener('click', e=>{
   if(lv){ e.stopPropagation(); return toggleLoved(+lv.dataset.loved); }
   const dn = e.target.closest('[data-done]');
   if(dn){ e.stopPropagation(); return toggleDone(+dn.dataset.done); }
+  const dd = e.target.closest('[data-deldayta]');
+  if(dd){ e.stopPropagation(); return removeDay(+dd.dataset.deldayta); }
   const dt = e.target.closest('[data-day]');
   if(dt){
     e.stopPropagation();
