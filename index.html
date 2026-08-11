@@ -892,6 +892,27 @@ function gmapsDirUrl(items){
   const wpPidParam = hasAnyMidPid ? `&waypoint_place_ids=${encodeURIComponent(waypointPids)}` : '';
   return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(locStr(dest))}${destPidParam}&waypoints=${encodeURIComponent(waypoints)}${wpPidParam}&travelmode=driving&dir_action=navigate`;
 }
+// Same as gmapsDirUrl but WITHOUT dir_action=navigate — opens as a route
+// preview (with a "Start" button) instead of auto-starting navigation.
+// Meant for sharing with someone else to look at, not for driving right now.
+function gmapsPreviewUrl(items){
+  return gmapsDirUrl(items).replace('&dir_action=navigate', '');
+}
+async function shareGmapsLink(){
+  const items = planItemsForDay();
+  if(!items.length) return;
+  const capped = items.slice(0,10);
+  const ordered = bestOrder(capped);
+  const url = gmapsPreviewUrl(ordered);
+  if(navigator.share){
+    try{
+      await navigator.share({ title: 'เส้นทางร้านอาหารเชียงใหม่ (CNX Guide)', text: `เพื่อนแชร์เส้นทาง ${ordered.length} ร้านมาให้ กดเปิดใน Google Maps ได้เลย`, url });
+      return;
+    }catch(e){ /* cancelled — fall through to copy */ }
+  }
+  navigator.clipboard?.writeText(url).then(()=>toast('คัดลอกลิงก์ Google Maps แล้ว ส่งให้เพื่อนได้เลย'))
+    .catch(()=>toast('คัดลอกไม่สำเร็จ ลองใหม่อีกครั้ง'));
+}
 async function fetchOSRMRoute(ordered){
   if(ordered.length<2) return null;
   const coordStr = ordered.map(r=>`${r.lng},${r.lat}`).join(';');
@@ -958,10 +979,11 @@ function render(){
     view.innerHTML = (state.plan?dayTabsHtml():'') + Object.entries(groups).map(([z,items])=>
       `<div class="planzone"><h4>${esc(z)} · ${items.length} ร้าน</h4>
        <div class="grid" style="padding-bottom:0">${items.map(card).join('')}</div></div>`
-    ).join('') + (state.plan?`<div style="padding:4px 0 40px;display:flex;gap:8px;flex-wrap:wrap">${gmapsAllBtn}${bulkBtn}<button class="btn btn-s" id="btnCopy" style="width:auto;padding:10px 18px">คัดลอกแผนเป็นข้อความ</button><button class="btn btn-s" id="btnLine" style="width:auto;padding:10px 18px;color:#06C755;border-color:rgba(6,199,85,.4)">แชร์ไป LINE</button><button class="btn btn-s" id="btnShareLink" style="width:auto;padding:10px 18px;color:var(--gold);border-color:rgba(226,176,74,.4)">🔗 แชร์แผนเป็นลิงก์</button></div>`:'');
+    ).join('') + (state.plan?`<div style="padding:4px 0 40px;display:flex;gap:8px;flex-wrap:wrap">${gmapsAllBtn}${bulkBtn}<button class="btn btn-s" id="btnCopy" style="width:auto;padding:10px 18px">คัดลอกแผนเป็นข้อความ</button><button class="btn btn-s" id="btnLine" style="width:auto;padding:10px 18px;color:#06C755;border-color:rgba(6,199,85,.4)">แชร์ไป LINE</button><button class="btn btn-s" id="btnShareLink" style="width:auto;padding:10px 18px;color:var(--gold);border-color:rgba(226,176,74,.4)">🔗 แชร์แผนเป็นลิงก์</button><button class="btn btn-s" id="btnShareGmapsLink" style="width:auto;padding:10px 18px;color:#4285F4;border-color:rgba(66,133,244,.4)">📍 แชร์เป็นลิงก์ Google Maps</button></div>`:'');
     const c = $('#btnCopy'); if(c) c.onclick = ()=>copyPlan();
     const ln = $('#btnLine'); if(ln) ln.onclick = ()=>shareLine();
     const sl = $('#btnShareLink'); if(sl) sl.onclick = ()=>shareLink();
+    const sgl = $('#btnShareGmapsLink'); if(sgl) sgl.onclick = ()=>shareGmapsLink();
     const ga = $('#btnGmapsAll'); if(ga) ga.onclick = ()=>{
       const full = planItemsForDay();
       if(full.length<1) return;
@@ -1299,6 +1321,21 @@ async function shareLink(){
     }catch(e){ /* user cancelled share sheet — fall through to copy */ }
   }
   navigator.clipboard?.writeText(url).then(()=>toast('คัดลอกลิงก์แผนแล้ว ส่งให้เพื่อนได้เลย'))
+    .catch(()=>toast('คัดลอกไม่สำเร็จ ลองใหม่อีกครั้ง'));
+}
+async function shareGmapsLink(){
+  const full = planItemsForDay();
+  if(!full.length) return;
+  const capped = full.slice(0,10);
+  const ordered = bestOrder(capped);
+  const url = gmapsDirUrl(ordered);
+  if(navigator.share){
+    try{
+      await navigator.share({ title: 'เส้นทางกินเชียงใหม่', text: `เส้นทาง ${ordered.length} ร้าน กดลิงก์เพื่อเริ่มนำทางใน Google Maps ได้เลย`, url });
+      return;
+    }catch(e){ /* user cancelled share sheet — fall through to copy */ }
+  }
+  navigator.clipboard?.writeText(url).then(()=>toast('คัดลอกลิงก์ Google Maps แล้ว เพื่อนกดแล้วเริ่มนำทางได้เลย ไม่ต้องเปิดแอปนี้'))
     .catch(()=>toast('คัดลอกไม่สำเร็จ ลองใหม่อีกครั้ง'));
 }
 function loadPlanFromUrl(){
