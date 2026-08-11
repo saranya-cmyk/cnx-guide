@@ -1549,6 +1549,18 @@ window.addEventListener('storage', (e)=>{
   render();
 });
 
+// Cleanup: past data edits (adding/removing restaurants) could have shifted
+// IDs, leaving stale favorite/loved/visited marks pointing at restaurants
+// that no longer exist. Silently prune those on load so counts stay correct.
+(function pruneOrphanedIds(){
+  const validIds = new Set(DATA.map(r=>r.id));
+  let changed = false;
+  [...favs].forEach(id=>{ if(!validIds.has(id)){ favs.delete(id); delete favDays[id]; changed=true; } });
+  [...loved].forEach(id=>{ if(!validIds.has(id)){ loved.delete(id); changed=true; } });
+  [...done].forEach(id=>{ if(!validIds.has(id)){ done.delete(id); changed=true; } });
+  if(changed){ saveFavs(); saveFavDays(); saveLoved(); saveDone(); }
+})();
+
 loadPlanFromUrl();
 render();
 
