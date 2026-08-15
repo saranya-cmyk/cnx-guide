@@ -773,7 +773,20 @@ function filtered(){
     name:(a,b)=>a.name.localeCompare(b.name,'th'),
     zone:(a,b)=>a.area.localeCompare(b.area,'th') || ti(a.tier)-ti(b.tier)
   }[state.sort];
-  if(state.near && userLoc){
+  if(state.q){
+    // When actively searching, rank by relevance first (name starts with the
+    // query > name contains it > only found elsewhere), falling back to the
+    // normal sort as a tiebreaker — a single common letter shouldn't bury an
+    // exact-name match under whatever happens to be S+ tier.
+    const q = state.q.toLowerCase();
+    const rel = r=>{
+      const n = r.name.toLowerCase();
+      if(n.startsWith(q)) return 0;
+      if(n.includes(q)) return 1;
+      return 2;
+    };
+    out.sort((a,b)=> rel(a)-rel(b) || (state.near && userLoc ? haversineKm(userLoc.lat,userLoc.lng,a.lat,a.lng)-haversineKm(userLoc.lat,userLoc.lng,b.lat,b.lng) : cmp(a,b)));
+  } else if(state.near && userLoc){
     out.sort((a,b)=> haversineKm(userLoc.lat,userLoc.lng,a.lat,a.lng) - haversineKm(userLoc.lat,userLoc.lng,b.lat,b.lng));
   } else {
     out.sort(cmp);
@@ -1065,7 +1078,11 @@ function render(){
         toast(`เอาออกจากแผน ${n} ร้านแล้ว`);
       };
     }
-  } else if(state.sort==='tier'){
+  } else if(state.sort==='tier' && !state.q){
+    // Skip tier-grouping while actively searching — grouping by tier would
+    // re-bury a relevant name match under whichever tier section it falls in,
+    // undoing the relevance sort above. A flat, relevance-ordered list is
+    // more useful when you're looking for something specific.
     const groups = {};
     list.forEach(r=>(groups[r.tier] ||= []).push(r));
     view.innerHTML = TIERS.filter(t=>groups[t]).map(t=>
