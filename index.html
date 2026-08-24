@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CNX">
-<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ ลำพูน ลำปาง 168 ร้าน คัดตามเหตุผลที่ควรไปจริง">
+<meta name="description" content="คู่มือร้านอาหาร คาเฟ่ และบาร์เชียงใหม่ ลำพูน ลำปาง 165 ร้าน คัดตามเหตุผลที่ควรไปจริง">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Trirong:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
@@ -1446,6 +1446,12 @@ $('#q').addEventListener('input', e=>{
     state.q = val;
     render();
     $('#searchSpin').hidden = true;
+    // On mobile the on-screen keyboard covers the results, and there's a lot
+    // of header content above — scroll the results into view automatically
+    // so typing doesn't require a manual scroll every time.
+    if(val){
+      $('#resCount')?.scrollIntoView({behavior:'smooth', block:'start'});
+    }
   }, 180);
 });
 $('#catChips').addEventListener('click', e=>{
