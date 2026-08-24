@@ -1139,7 +1139,7 @@ function drawHomeMarker(){
   if(!homeBase) return;
   L.marker([homeBase.lat, homeBase.lng], {
     icon: L.divIcon({html:`<div class="pin-home">🏠</div>`, className:'', iconSize:[28,28], iconAnchor:[14,26]})
-  }).addTo(homeLayer).bindPopup('จุดฐานของคุณ (ที่พัก)');
+  }).addTo(homeLayer).bindPopup(`จุดฐานของคุณ: ${esc(homeBase.label || 'ที่พัก')}`);
 }
 function renderMap(list){
   $('#mapDayTabs').innerHTML = state.plan ? dayTabsHtml() : '';
@@ -1637,9 +1637,18 @@ function renderHomeBaseHint(){
     };
   } else {
     hint.hidden = false;
-    hint.innerHTML = `🏠 ตั้งจุดฐานไว้แล้ว
-      <button class="pill" style="padding:2px 10px;margin-left:6px" id="btnHomeChange">เปลี่ยนตำแหน่ง</button>
+    hint.innerHTML = `🏠 <b>${esc(homeBase.label || 'ที่พัก')}</b>
+      <button class="pill" style="padding:2px 10px;margin-left:6px" id="btnHomeRename">เปลี่ยนชื่อ</button>
+      <button class="pill" style="padding:2px 10px" id="btnHomeChange">เปลี่ยนตำแหน่ง</button>
       <button class="pill" style="padding:2px 10px" id="btnHomeClear">ลบจุดฐาน</button>`;
+    $('#btnHomeRename').onclick = ()=>{
+      const name = prompt('ตั้งชื่อจุดฐาน (เช่น ที่พัก, โรงแรม ABC)', homeBase.label || 'ที่พัก');
+      if(name===null) return;
+      homeBase.label = name.trim() || 'ที่พัก';
+      store.set('cm_homebase', homeBase);
+      renderHomeBaseHint();
+      drawHomeMarker();
+    };
     $('#btnHomeChange').onclick = ()=>{ homeBase=null; store.set('cm_homebase', null); state.nearHome=false; $('#pillHomeBase').classList.remove('on'); renderHomeBaseHint(); };
     $('#btnHomeClear').onclick = ()=>{
       homeBase=null; store.set('cm_homebase', null);
@@ -1654,19 +1663,23 @@ function setHomeBaseFromGPS(){
   toast('กำลังหาตำแหน่งปัจจุบัน…');
   navigator.geolocation.getCurrentPosition(
     pos=>{
-      homeBase = {lat:pos.coords.latitude, lng:pos.coords.longitude};
+      const name = prompt('ตั้งชื่อจุดฐาน (เช่น ที่พัก, โรงแรม ABC)', 'ที่พัก');
+      if(name===null) return; // cancelled — don't set anything
+      homeBase = {lat:pos.coords.latitude, lng:pos.coords.longitude, label: name.trim() || 'ที่พัก'};
       store.set('cm_homebase', homeBase);
       state.nearHome = true;
       $('#pillHomeBase').classList.add('on');
       renderHomeBaseHint();
       render();
-      toast('ตั้งจุดฐานจากตำแหน่งปัจจุบันแล้ว 🏠');
+      toast(`ตั้งจุดฐาน "${homeBase.label}" แล้ว 🏠`);
     },
     ()=>toast('ขอตำแหน่งไม่สำเร็จ ลองอนุญาตการเข้าถึงตำแหน่งอีกครั้ง')
   );
 }
 function setHomeBaseFromMap(lat, lng){
-  homeBase = {lat, lng};
+  const name = prompt('ตั้งชื่อจุดฐาน (เช่น ที่พัก, โรงแรม ABC)', 'ที่พัก');
+  if(name===null){ homeBasePickMode=false; $('#mapPickBanner').hidden=true; return; }
+  homeBase = {lat, lng, label: name.trim() || 'ที่พัก'};
   store.set('cm_homebase', homeBase);
   homeBasePickMode = false;
   $('#mapPickBanner').hidden = true;
@@ -1674,7 +1687,7 @@ function setHomeBaseFromMap(lat, lng){
   $('#pillHomeBase').classList.add('on');
   renderHomeBaseHint();
   renderMap(filtered());
-  toast('ตั้งจุดฐานตรงนี้แล้ว 🏠');
+  toast(`ตั้งจุดฐาน "${homeBase.label}" แล้ว 🏠`);
 }
 $('#pillHomeBase').addEventListener('click', ()=>{
   if(!homeBase){ renderHomeBaseHint(); return; }
@@ -1682,7 +1695,7 @@ $('#pillHomeBase').addEventListener('click', ()=>{
   $('#pillHomeBase').classList.toggle('on', state.nearHome);
   if(state.nearHome){ state.near=false; $('#pillNearMe').classList.remove('on'); $('#nearMeHint').hidden=true; }
   render();
-  if(state.nearHome) toast('เรียงตามระยะใกล้ที่พักแล้ว');
+  if(state.nearHome) toast(`เรียงตามระยะใกล้ ${homeBase?.label || 'ที่พัก'} แล้ว`);
 });
 if(homeBase) $('#pillHomeBase').classList.add('on');
 $('#btnCancelPick').addEventListener('click', ()=>{
